@@ -28,15 +28,14 @@ let resize = () => {
 
     // Background clouds
     let cloud_fill = () => background_fill(234, 253, 219);
-    let cloud_radius = background_canvas.width / 16;
+    let cloud_radius = background_canvas.height / 8;
     let cloud_base = background_canvas.height / 1.5;
-    let cloud_max_deviation = background_canvas.height / 8;
-    for (let i = 0; i <= background_canvas.width; i += background_canvas.width * 1.5 / cloud_radius) {
+    for (let i = 0; i <= background_canvas.width; i += background_canvas.width / cloud_radius) {
         background_ctx.beginPath();
-        background_ctx.arc(i, cloud_base + Math.random() * cloud_max_deviation, cloud_radius, 0, 2 * Math.PI);
+        background_ctx.arc(i, cloud_base + Math.random() * cloud_radius, cloud_radius, 0, full_rot);
         cloud_fill();
     }
-    background_ctx.rect(0, cloud_base + cloud_max_deviation - cloud_radius, background_canvas.width, background_canvas.height);
+    background_ctx.rect(0, cloud_base, background_canvas.width, background_canvas.height);
     cloud_fill();
 
     // Remove aliasing effects
@@ -79,6 +78,8 @@ let draw = () => {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(background_canvas, 0, 0, c.width, c.height);
 
+    rect(0, 0, 100, 100);
+    fill(84, 56, 71);
 
     //ctx.stroke();
     //oval(95, 50, 40, 40, 0);
