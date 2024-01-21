@@ -11,7 +11,10 @@ var ctx = c.getContext("2d");
 let background_canvas = new OffscreenCanvas(0, 0);
 let background_ctx = background_canvas.getContext("2d");
 
-// Events
+// Globals
+let full_rot = 2 * Math.PI;
+
+// Events (there's something that went wrong here)
 let resize = () => {
     // Set the widths and heights
     // For the main canvas
@@ -32,7 +35,7 @@ let resize = () => {
     let cloud_base = background_canvas.height / 1.5;
     for (let i = 0; i <= background_canvas.width; i += background_canvas.width / cloud_radius) {
         background_ctx.beginPath();
-        background_ctx.arc(i, cloud_base + Math.random() * cloud_radius, cloud_radius, 0, full_rot);
+        background_ctx.arc(i, cloud_base + Math.random() * cloud_radius, cloud_radius, 0, full_rot); // This line appears to be issue
         cloud_fill();
     }
     background_ctx.rect(0, cloud_base, background_canvas.width, background_canvas.height);
@@ -43,14 +46,11 @@ let resize = () => {
         for (let y = 0; y < background_canvas.height; y++) {
             let data = String(background_ctx.getImageData(x, y, 1, 1).data);
             if (data != "112,197,205,255" && data != "234,253,219,255")
-                background_ctx.putImageData(new ImageData(new Uint8ClampedArray([112, 197, 205, 255]), 1, 1), x, y);
+                background_ctx.putImageData(new ImageData(new Uint8ClampedArray([234,253,219,255]), 1, 1), x, y);
         }
 };
 resize();
 window.addEventListener("resize", resize);
-
-// Globals
-let full_rot = 2 * Math.PI;
 
 // Functions
 function general_fill(context) {
@@ -78,8 +78,8 @@ let draw = () => {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(background_canvas, 0, 0, c.width, c.height);
 
-    rect(0, 0, 100, 100);
-    fill(84, 56, 71);
+    //rect(0, 0, 100, 100);
+    //fill(84, 56, 71);
 
     //ctx.stroke();
     //oval(95, 50, 40, 40, 0);
