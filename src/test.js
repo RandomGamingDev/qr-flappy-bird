@@ -26,19 +26,19 @@ let resize = () => {
 
     // Render the background
     // Background's background
-    background_ctx.rect(0, 0, background_canvas.width, background_canvas.height);
+    background_ctx.fillRect(0, 0, background_canvas.width, background_canvas.height);
     background_fill(112, 197, 205);
 
     // Background clouds
     let cloud_fill = () => background_fill(234, 253, 219);
-    let cloud_radius = background_canvas.height / 8;
-    let cloud_base = background_canvas.height / 1.5;
-    for (let i = 0; i <= background_canvas.width; i += background_canvas.width / cloud_radius) {
+    let cloud_radius = 16;
+    let cloud_base = background_canvas.height / 1.35;
+    for (let i = 0; i <= background_canvas.width; i += cloud_radius) {
         background_ctx.beginPath();
         background_ctx.arc(i, cloud_base + Math.random() * cloud_radius, cloud_radius, 0, full_rot); // This line appears to be issue
         cloud_fill();
     }
-    background_ctx.rect(0, cloud_base, background_canvas.width, background_canvas.height);
+    background_ctx.fillRect(0, cloud_base, background_canvas.width, background_canvas.height, background_canvas.height - cloud_base);
     cloud_fill();
 
     // Remove aliasing effects
@@ -46,8 +46,29 @@ let resize = () => {
         for (let y = 0; y < background_canvas.height; y++) {
             let data = String(background_ctx.getImageData(x, y, 1, 1).data);
             if (data != "112,197,205,255" && data != "234,253,219,255")
-                background_ctx.putImageData(new ImageData(new Uint8ClampedArray([234,253,219,255]), 1, 1), x, y);
+                background_ctx.putImageData(new ImageData(new Uint8ClampedArray([112,197,205,255]), 1, 1), x, y);
         }
+
+    // Top black line (scale up pixel specific by 3)
+    background_fill(84, 56, 71);
+    background_ctx.fillRect(0, background_canvas.height * 0.921, background_canvas.width, 1);
+
+    // Glistening Green
+    background_fill(228, 253, 139)
+    background_ctx.fillRect(0, background_canvas.height * 0.921 + 1, background_canvas.width, 1);
+
+
+    // Grass underside
+    background_fill(85, 128, 34)
+    background_ctx.fillRect(0, background_canvas.height * 0.941 + 2, background_canvas.width, 1);
+
+    // Grass shadow
+    background_fill(215, 168, 76);
+    background_ctx.fillRect(0, background_canvas.height * 0.941 + 3, background_canvas.width, 1);
+
+    // Dirt
+    background_fill(222, 216, 149);
+    background_ctx.fillRect(0, background_canvas.height * 0.941 + 4, background_canvas.width, background_canvas.height * 0.059 - 4);
 };
 resize();
 window.addEventListener("resize", resize);
@@ -78,8 +99,12 @@ let draw = () => {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(background_canvas, 0, 0, c.width, c.height);
 
-    //rect(0, 0, 100, 100);
-    //fill(84, 56, 71);
+    // Grass base
+    background_fill(115, 191, 46);
+    background_ctx.fillRect(0, background_canvas.height * 0.921 + 2, background_canvas.width, background_canvas.height * 0.019);
+
+    // 156 230 89 (Grass stripe)
+
 
     //ctx.stroke();
     //oval(95, 50, 40, 40, 0);
