@@ -16,6 +16,9 @@ let full_rot = 2 * Math.PI;
 let dynamic_floor_start;
 let dynamic_dirt_start;
 
+// Colors
+let edge_color = [84, 56, 71];
+
 // Lambdas
 let background_bar = (fill, y, height) => {
     background_fill(...fill);
@@ -59,7 +62,7 @@ let resize = () => {
     dynamic_dirt_start = Math.floor(background_canvas.height * 0.941);
 
     // Top black line (scale up pixel spefic by 3)
-    background_pxbar([84, 56, 71], dynamic_floor_start);
+    background_pxbar(edge_color, dynamic_floor_start);
     // Glistening Green
     background_pxbar([228, 253, 139], dynamic_floor_start + 1);
     // Grass underside
@@ -76,8 +79,12 @@ resize();
 window.addEventListener("resize", resize);
 
 // Functions
+function rgb() {
+    return `rgb(${ [...arguments] })`;
+}
+
 function general_fill(context) {
-    context.fillStyle = `rgb(${ [...arguments].slice(1) })`;
+    context.fillStyle = rgb([...arguments].slice(1));
     context.fill();
 }
 
@@ -88,10 +95,29 @@ function background_fill() {
     general_fill(background_ctx, ...arguments);
 }
 
+function stroke() {
+    ctx.strokeStyle = rgb(...arguments);
+}
+
 function oval() {
     //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
     ctx.beginPath();
     ctx.ellipse(...arguments, 0, full_rot);
+}
+
+function pipe(x, y) {
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    stroke(...edge_color);
+    ctx.rect(x, y, 100, c.height - y - dynamic_floor_start / 3);
+    fill(115, 191, 46);
+    ctx.stroke()
+
+    fill(255, 0, 0)
+    ctx.fillRect(500, 200, 100, c.height - y - dynamic_floor_start / 3);
+
+    //dynamic_floor_start
 }
 
 // Draw
@@ -109,6 +135,10 @@ let draw = () => {
     background_fill(115, 191, 46);
     let a = Math.floor(background_canvas.height * 0.921);
     background_ctx.fillRect(0, a + 2, background_canvas.width, Math.ceil(background_canvas.height * 0.019));
+
+    // Maybe use another canvas for the stripes?
+    pipe(100, 300);
+
     //*/
     //background_fill(255, 0, 0);
     // 156 230 89 (Grass stripe)
