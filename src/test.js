@@ -38,10 +38,8 @@ let resize = () => {
         background_ctx.arc(i, cloud_base + Math.random() * cloud_radius, cloud_radius, 0, full_rot); // This line appears to be issue
         cloud_fill();
     }
-    background_ctx.fillRect(0, cloud_base, background_canvas.width, background_canvas.height, background_canvas.height - cloud_base);
-    cloud_fill();
 
-    // Remove aliasing effects
+    // Remove the clouds' aliasing effects
     for (let x = 0; x < background_canvas.width; x++)
         for (let y = 0; y < background_canvas.height; y++) {
             let data = String(background_ctx.getImageData(x, y, 1, 1).data);
@@ -49,7 +47,7 @@ let resize = () => {
                 background_ctx.putImageData(new ImageData(new Uint8ClampedArray([112,197,205,255]), 1, 1), x, y);
         }
 
-    // Top black line (scale up pixel specific by 3)
+    // Top black line (scale up pixel spefic by 3)
     background_fill(84, 56, 71);
     background_ctx.fillRect(0, background_canvas.height * 0.921, background_canvas.width, 1);
 
@@ -69,6 +67,10 @@ let resize = () => {
     // Dirt
     background_fill(222, 216, 149);
     background_ctx.fillRect(0, background_canvas.height * 0.941 + 4, background_canvas.width, background_canvas.height * 0.059 - 4);
+
+    // Fill in the cloud base
+    cloud_fill();
+    background_ctx.fillRect(0, cloud_base, background_canvas.width, background_canvas.height * 0.921 - cloud_base);
 };
 resize();
 window.addEventListener("resize", resize);
@@ -99,15 +101,16 @@ let draw = () => {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(background_canvas, 0, 0, c.width, c.height);
 
+    //background_ctx.fillRect(430, 175, 10, 10);
+
+    background_ctx.beginPath();
+    background_ctx.arc(0,0,0,0,0); // This line appears to be issue
     // Grass base
     background_fill(115, 191, 46);
     background_ctx.fillRect(0, background_canvas.height * 0.921 + 2, background_canvas.width, background_canvas.height * 0.019);
 
+    background_fill(255, 0, 0);
     // 156 230 89 (Grass stripe)
-
-
-    //ctx.stroke();
-    //oval(95, 50, 40, 40, 0);
 
     window.requestAnimationFrame(draw);
 }
