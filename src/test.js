@@ -1,9 +1,10 @@
 // Init
 let d = document;
-d.body.style = "margin:0;";
+d.body.style = "margin:0";
 
 // Main Canvas
 let c = d.createElement("canvas");
+c.style = "display:block"
 d.body.appendChild(c);
 var ctx = c.getContext("2d");
 
@@ -34,8 +35,8 @@ let resize = () => {
     c.width = window.innerWidth;
     c.height = window.innerHeight;
     // For the background canvas
-    background_canvas.width = c.width / 3;
-    background_canvas.height = c.height / 3;
+    background_canvas.width = Math.floor(c.width / 3);
+    background_canvas.height = Math.floor(c.height / 3);
 
     // Render the background
     // Background's background
@@ -47,8 +48,9 @@ let resize = () => {
     let cloud_radius = 16;
     let cloud_base = Math.floor(background_canvas.height / 1.35);
     for (let i = 0; i <= background_canvas.width; i += cloud_radius) {
-        background_ctx.beginPath();
+        background_ctx.beginPath(); // Without begin and end path everything turns green
         background_ctx.arc(i, cloud_base + Math.random() * cloud_radius, cloud_radius, 0, full_rot);
+        background_ctx.closePath();
         background_fill(...cloud_fill);
     }
 
@@ -103,21 +105,31 @@ function oval() {
     //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
     ctx.beginPath();
     ctx.ellipse(...arguments, 0, full_rot);
+    ctx.closePath();
+}
+
+function strokeFillRect() {
+    ctx.fillRect(...arguments);
+    ctx.strokeRect(...arguments);
 }
 
 function pipe(x, y) {
     ctx.lineWidth = 3;
 
-    ctx.beginPath();
+
+    // 160 -> 0.25 * h pipe gap
+    // thick part width 85 -> 0.18 * w, height 40 -> 0.06 * h
+    // thin part width 80 -> 0.17 * w
+    // 484x642
+
+    // Distance between pipes
+    let pipe_gap = c.height / 4;
+
+    // Bottom rectangle
     stroke(...edge_color);
-    ctx.rect(x, y, 100, c.height - y - dynamic_floor_start / 3);
     fill(115, 191, 46);
-    ctx.stroke()
-
-    fill(255, 0, 0)
-    ctx.fillRect(500, 200, 100, c.height - y - dynamic_floor_start / 3);
-
-    //dynamic_floor_start
+    strokeFillRect(x, 0, 100, y);
+    strokeFillRect(x, y + pipe_gap, 100, 3 * dynamic_floor_start - y + 3);
 }
 
 // Draw
@@ -127,19 +139,22 @@ let draw = () => {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(background_canvas, 0, 0, c.width, c.height);
 
-    //background_ctx.fillRect(430, 175, 10, 10);
+    // Test rectangle
 
     //background_ctx.beginPath();
     //background_ctx.arc(0,0,0,0,0); // This line appears to be issue
+
     // Grass base
     background_fill(115, 191, 46);
-    let a = Math.floor(background_canvas.height * 0.921);
-    background_ctx.fillRect(0, a + 2, background_canvas.width, Math.ceil(background_canvas.height * 0.019));
+    background_ctx.fillRect(0, dynamic_floor_start + 2, background_canvas.width, Math.ceil(background_canvas.height * 0.019));
 
     // Maybe use another canvas for the stripes?
     pipe(100, 300);
 
-    //*/
+    fill(255, 0, 0);
+    ctx.fillRect(100, 300, 10, 10);
+    //ctx.fillRect(100, dynamic_floor_start * 3, 10, 10);
+
     //background_fill(255, 0, 0);
     // 156 230 89 (Grass stripe)
 
