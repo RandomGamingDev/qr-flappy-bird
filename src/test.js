@@ -65,7 +65,7 @@ let resize = () => {
 
     // Remove the clouds' aliasing effects
     for (let x = 0; x < background_canvas.width; x++)
-        for (let y = 0; y < background_canvas.height; y++)
+        for (let y = cloud_base - cloud_radius; y < cloud_base; y++)
             if (!["112,197,205,255", String(cloud_fill)].includes(String(background_ctx.getImageData(x, y, 1, 1).data)))
                 background_ctx.putImageData(new ImageData(new Uint8ClampedArray(cloud_fill), 1, 1), x, y);
 
@@ -283,8 +283,8 @@ let draw = () => {
     // 186 235 191 for the windows
 
     // Maybe use another canvas for the stripes?
-    //for (let x = game_x; x < c.width; x += pipe_gap)
-        //pipe_pair(x, 300);
+    for (let x = game_x; x < c.width; x += pipe_gap)
+        pipe_pair(x, 300);
 
     window.requestAnimationFrame(draw);
 }
