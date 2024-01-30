@@ -106,6 +106,18 @@ let resize = () => {
         // Right building
         background_rect(x, bush_base_start - 15, 7, 15);
         background_rect(x, bush_base_start - 17, 3, 1);
+       
+        /*
+        for (let rect of 
+                // x, y & height, width
+                [
+                    [22, 14, 9],
+                    [9, 19, 8],
+                    [0, 15, 7],
+                ]
+            )
+            background_rect(x - rect[0], bush_base_start - rect[1], rect[2], rect[1]);
+        */
 
         background_stroke(161, 214, 215);
         background_fill(216, 243, 204);
