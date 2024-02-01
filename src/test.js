@@ -60,9 +60,8 @@ let resize = () => {
     temp = seed;
     seed = 5;
     background_beginPath(); // Without begin and end path everything turns green
-    for (let x = 0; x <= background_width; x += cloud_radius) {
+    for (let x = 0; x <= background_width; x += cloud_radius)
         background_ctx.arc(x, cloud_base + random() * cloud_radius, cloud_radius, 0, full_rot);
-    }
     background_fill(...cloud_fill);
     background_beginPath();
     seed = temp;
@@ -90,7 +89,7 @@ let resize = () => {
     // Fill in the cloud base
     background_bar(cloud_fill, cloud_base, dynamic_floor_start - cloud_base);
 
-    let bush_base_start = floor(background_height * 0.82);
+    let bush_base = floor(background_height * 0.82);
 
     // Buildings
     for (let x = 0; x <= background_width; x += 39) {
@@ -98,14 +97,16 @@ let resize = () => {
         background_beginPath();
 
         // Left building
-        background_rect(x - 22, bush_base_start - 14, 9, 14);
-        background_rect(x - 18, bush_base_start - 17, 5, 2);
+        background_rect(x - 22, bush_base - 14, 9, 14);
+        background_rect(x - 18, bush_base - 17, 5, 2);
+
+
         // Middle building
-        background_rect(x - 9, bush_base_start - 19, 8, 19);
-        background_rect(x - 4, bush_base_start - 21, 3, 2);
+        background_rect(x - 9, bush_base - 19, 8, 19);
+        background_rect(x - 4, bush_base - 21, 3, 2);
         // Right building
-        background_rect(x, bush_base_start - 15, 7, 15);
-        background_rect(x, bush_base_start - 17, 3, 1);
+        background_rect(x, bush_base - 15, 7, 15);
+        background_rect(x, bush_base - 17, 3, 1);
        
         /*
         for (let rect of 
@@ -122,18 +123,41 @@ let resize = () => {
         background_stroke(161, 214, 215);
         background_fill(216, 243, 204);
 
-
         // Bottom left building
         background_beginPath();
-        background_rect(x - 14, bush_base_start - 9, 4, 9);
+        background_rect(x - 14, bush_base - 9, 4, 9);
         background_stroke(161, 214, 215);
         background_fill(216, 243, 204);
     }
     background_beginPath();
 
+    // Building Windows
+    /*
+    for (let x = 0; x < background_width; x += 2)
+        for (let y = 0; y < background_height; y += 3)
+            if (String(background_ctx.getImageData(x, y, 1, 1).data) == "216,243,204,255")
+                for (let i = 0; i < 2; i++)
+                    background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, 255]), 1, 1), x, y + i);
+    */
+
     // Bushes
     // Bush base
-    background_bar([130, 228, 140], bush_base_start, dynamic_floor_start - bush_base_start);
+    background_bar([130, 228, 140], bush_base, dynamic_floor_start - bush_base);
+
+    let bush_stroke = [];
+    let bush_fill = [130, 228, 140, 255];
+    let bush_radius = 8;
+    // Set the seed for generating the clouds
+    temp = seed;
+    seed = 5;
+    for (let x = 0; x <= background_width; x += bush_radius) {
+        background_beginPath(); // Without begin and end path everything turns green
+        background_ctx.arc(x, bush_base + random() * bush_radius, bush_radius, 0, full_rot / 2, true);
+        background_stroke(109, 202, 135);
+        background_fill(...bush_fill);
+        background_beginPath();
+    }
+    seed = temp;
 
     // Test bush
     background_beginPath(); // Without begin and end path everything turns green
@@ -303,8 +327,8 @@ let draw = () => {
     // 186 235 191 for the windows
 
     // Maybe use another canvas for the stripes?
-    for (let x = game_x; x < width; x += pipe_gap)
-        pipe_pair(x, 300);
+    //for (let x = game_x; x < width; x += pipe_gap)
+    //    pipe_pair(x, 300);
 
     window.requestAnimationFrame(draw);
 }
