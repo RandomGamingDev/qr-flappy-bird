@@ -17,11 +17,12 @@ let full_rot = 2 * Math.PI;
 let dynamic_floor_start;
 let dynamic_dirt_start;
 let temp;
-let seed;
+let seed = Math.random();
 let width;
 let height;
 let background_width;
 let background_height;
+let pipe_width = 74;
 
 // Colors
 let edge_color = [84, 56, 71];
@@ -203,7 +204,6 @@ function oval() {
     //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
     ctx.beginPath();
     ctx.ellipse(...arguments, 0, full_rot);
-    ctx.closePath();
 }
 
 function fillRect() {
@@ -292,7 +292,6 @@ function pipe_pair(x, y) {
 
     // Pipe parameters
     let pipe_gap = height / 4;
-    let pipe_width = 74;
     // Pipe parameters
     let spout_x = x - 3;
     let spout_width = 80;
@@ -306,10 +305,19 @@ function pipe_pair(x, y) {
     pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
 }
 
-let game_x = 0;
+let game_x = width * 1.5;
+let pipe_x = 0;
+let start;
+let deltaTime;
+let player_y = 0;
+let player_vel_y = 0;
+let player_terminal_vel_y = 3;
 
 // Draw
 let draw = () => {
+    deltaTime = new Date() - start ? start : 0;
+    start = new Date();
+
     // Background
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(background_canvas, 0, 0, width, height);
@@ -326,10 +334,32 @@ let draw = () => {
 
     // 186 235 191 for the windows
 
-    // Maybe use another canvas for the stripes?
-    //for (let x = game_x; x < width; x += pipe_gap)
-    //    pipe_pair(x, 300);
+    // Draw the pipes
+    temp = seed;
+    for (let x = game_x - pipe_x; x < width; x += pipe_gap)
+        pipe_pair(x, height * (0.1 + random() * 0.4));
+    seed = temp;
+    // Start rendering from first visible pipe
+    if (-game_x + pipe_x > pipe_gap) {
+        pipe_x -= pipe_gap;
+        random();
+    }
+
+    // Draw the player
+    oval(100, player_y, 50, 25, 0, 0, full_rot);
+    fill(255, 0, 0);
+    // Apply gravity
+    player_vel_y += 0.25;
+    if (player_vel_y > player_terminal_vel_y)
+        player_vel_y = player_terminal_vel_y;
+    player_y += player_vel_y;
+
+    game_x -= 3;
 
     window.requestAnimationFrame(draw);
 }
 draw();
+
+addEventListener("mousedown", (event) => {
+    player_vel_y -= 4;
+});
