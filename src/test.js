@@ -150,23 +150,27 @@ let resize = () => {
     let bush_radius = 8;
     // Set the seed for generating the clouds
     temp = seed;
-    seed = 5;
-    for (let x = 0; x <= background_width; x += bush_radius) {
-        background_beginPath(); // Without begin and end path everything turns green
-        background_ctx.arc(x, bush_base + random() * bush_radius, bush_radius, 0, full_rot / 2, true);
-        background_stroke(109, 202, 135);
-        background_fill(...bush_fill);
-        background_beginPath();
+    seed = 10;
+    for (let y = 0; y < 5; y++) {
+        for (let x = -random() * 28; x <= background_width; x += 28) {
+            background_beginPath(); // Without begin and end path everything turns green
+            background_ctx.arc(x, bush_base + 2 * y, bush_radius, 0, full_rot / 2, true);
+            background_stroke(109, 202, 135);
+            background_fill(...bush_fill);
+            background_beginPath();
+        }
     }
     seed = temp;
 
     // Test bush
+    /*
     background_beginPath(); // Without begin and end path everything turns green
     background_ctx.arc(100, 270, 8, 0, full_rot / 2, true);
     background_ctx.lineWidth = 2;
     background_stroke(110, 203, 136);
     background_fill(130, 228, 140);
     background_beginPath();
+    */
 };
 resize();
 window.addEventListener("resize", resize);
