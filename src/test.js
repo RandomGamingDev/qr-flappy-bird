@@ -305,17 +305,17 @@ function pipe_pair(x, y) {
     pipe_rect(x, -3, pipe_width, y + 3);
     pipe_rect(spout_x, y - spout_height, spout_width, spout_height, 1);
     // Bottom pipe pipe & spout
-    pipe_rect(x, y + pipe_gap, pipe_width, floor(dynamic_floor_start + 1 - (y + pipe_gap) / 3) * 3);
+    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4); // floor(dynamic_floor_start + 1 - (y + pipe_gap) / 3) * 3
     pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
 }
 
-let game_x = width * 1.5;
+let game_x = 0;//width * 1.5;
 let pipe_x = 0;
 let start;
 let deltaTime;
 let player_y = 0;
 let player_vel_y = 0;
-let player_terminal_vel_y = 3;
+let player_terminal_vel_y = 5;
 
 // Draw
 let draw = () => {
@@ -349,8 +349,9 @@ let draw = () => {
         random();
     }
 
+    let player_width = 25;
     // Draw the player
-    oval(100, player_y, 50, 25, 0, 0, full_rot);
+    oval(width / 2 - player_width, player_y, player_width, 20, 0, 0, full_rot);
     fill(255, 0, 0);
     // Apply gravity
     player_vel_y += 0.25;
@@ -365,5 +366,5 @@ let draw = () => {
 draw();
 
 addEventListener("mousedown", (event) => {
-    player_vel_y -= 4;
+    player_vel_y = -10;
 });
