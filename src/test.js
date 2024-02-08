@@ -206,7 +206,7 @@ function background_stroke() {
 
 function oval() {
     //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
-    ctx.beginPath();
+    beginPath();
     ctx.ellipse(...arguments, 0, full_rot);
 }
 
@@ -226,8 +226,15 @@ function background_strokeRect() {
     background_ctx.strokeRect(...arguments);
 }
 
+function general_beginPath(context) {
+    context.beginPath(...[...arguments].slice(1));
+}
+
+function beginPath() {
+    general_beginPath(ctx);
+}
 function background_beginPath() {
-    background_ctx.beginPath(...arguments);
+    general_beginPath(background_ctx);
 }
 
 /*
@@ -305,7 +312,7 @@ function pipe_pair(x, y) {
     pipe_rect(x, -3, pipe_width, y + 3);
     pipe_rect(spout_x, y - spout_height, spout_width, spout_height, 1);
     // Bottom pipe pipe & spout
-    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4); // floor(dynamic_floor_start + 1 - (y + pipe_gap) / 3) * 3
+    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
     pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
 }
 
@@ -313,7 +320,7 @@ let game_x = 0;//width * 1.5;
 let pipe_x = 0;
 let start;
 let deltaTime;
-let player_y = 0;
+let player_y = height / 2;
 let player_vel_y = 0;
 let player_terminal_vel_y = 5;
 
@@ -351,7 +358,8 @@ let draw = () => {
 
     let player_width = 25;
     // Draw the player
-    oval(width / 2 - player_width, player_y, player_width, 20, 0, 0, full_rot);
+    beginPath();
+    oval(width / 2 - player_width, player_y, player_width, 20, player_vel_y / player_terminal_vel_y, 0, full_rot);
     fill(255, 0, 0);
     // Apply gravity
     player_vel_y += 0.25;
