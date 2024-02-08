@@ -359,7 +359,9 @@ let draw = () => {
     let player_width = 25;
     // Draw the player
     beginPath();
-    oval(width / 2 - player_width, player_y, player_width, 20, player_vel_y / player_terminal_vel_y, 0, full_rot);
+    let rot = player_vel_y / player_terminal_vel_y / 2; // 23 deg aka ~0.4 rad for max upper rot and directly vertical for min rot
+    console.log(rot);
+    oval(width / 2 - player_width, player_y, player_width, 20, rot, 0, full_rot);
     fill(255, 0, 0);
     // Apply gravity
     player_vel_y += 0.25;
