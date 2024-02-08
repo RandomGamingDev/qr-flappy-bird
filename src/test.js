@@ -281,7 +281,7 @@ function pipe_pair(x, y) {
     ctx.lineWidth = 3;
 
     // Pipe parameters
-    let pipe_gap = height / 4;
+    let pipe_gap = 157;
     // Pipe parameters
     let spout_x = x - 3;
     let spout_width = 80;
