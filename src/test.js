@@ -6,14 +6,15 @@ d.body.style = "margin:0";
 let c = d.createElement("canvas");
 c.style = "display:block"
 d.body.appendChild(c);
-var ctx = c.getContext("2d");
+let ctx = c.getContext("2d");
 
 // Pixelated Background Canvas
 let background_canvas = new OffscreenCanvas(0, 0);
 let background_ctx = background_canvas.getContext("2d");
 
 // Globals
-let full_rot = 2 * Math.PI;
+let pi = Math.PI;
+let full_rot = 2 * pi;
 let dynamic_floor_start;
 let dynamic_dirt_start;
 let temp;
@@ -28,6 +29,8 @@ let pipe_width = 74;
 let edge_color = [84, 56, 71];
 
 // Lambdas
+let rgb = a => `rgb(${ a })`;
+
 let background_bar = (fill, y, height) => {
     background_fill(...fill);
     background_fillRect(0, y, background_width, height);
@@ -37,6 +40,48 @@ let background_pxbar = (fill, y) => background_bar(fill, y, 1);
 
 let floor = (x) => Math.floor(x);
 let random = () => (seed = Math.sin(seed) * 10000) - floor(seed);
+
+let general_fill = (context, ...args) => {
+    context.fillStyle = rgb(args);
+    context.fill();
+}
+
+let fill = (...args) => general_fill(ctx, ...args);
+let background_fill = (...args) => general_fill(background_ctx, ...args);
+
+let general_stroke = (context, ...args) => {
+    context.strokeStyle = rgb(args);
+    context.stroke();
+}
+
+let stroke = (...args) => general_stroke(ctx, ...args);
+let background_stroke = (...args) => general_stroke(background_ctx, ...args);
+
+let oval = (...args) => {
+    //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
+    beginPath();
+    ctx.ellipse(...args, 0, full_rot);
+}
+
+let fillRect = (...args) => ctx.fillRect(...args);
+
+let background_rect = (...args) => background_ctx.rect(...args);
+
+let background_fillRect = (...args) => background_ctx.fillRect(...args);
+
+let background_strokeRect = (...args) => background_ctx.strokeRect(...args);
+
+let general_beginPath = (context, ...args) => context.beginPath(...args);
+
+let beginPath = () => general_beginPath(ctx);
+let background_beginPath = () => general_beginPath(background_ctx);
+
+/*
+function strokeFillRect() {
+    fillRect(...arguments);
+    ctx.strokeRect(...arguments);
+}
+*/
 
 // Events (there's something that went wrong here)
 let resize = () => {
@@ -154,7 +199,7 @@ let resize = () => {
     for (let y = 0; y < 5; y++) {
         for (let x = -random() * 28; x <= background_width; x += 28) {
             background_beginPath(); // Without begin and end path everything turns green
-            background_ctx.arc(x, bush_base + 2 * y, bush_radius, 0, full_rot / 2, true);
+            background_ctx.arc(x, bush_base + 2 * y, bush_radius, 0, pi, true);
             background_stroke(109, 202, 135);
             background_fill(...bush_fill);
             background_beginPath();
@@ -165,7 +210,7 @@ let resize = () => {
     // Test bush
     /*
     background_beginPath(); // Without begin and end path everything turns green
-    background_ctx.arc(100, 270, 8, 0, full_rot / 2, true);
+    background_ctx.arc(100, 270, 8, 0, pi, true);
     background_ctx.lineWidth = 2;
     background_stroke(110, 203, 136);
     background_fill(130, 228, 140);
@@ -176,73 +221,7 @@ resize();
 window.addEventListener("resize", resize);
 
 // Functions
-function rgb() {
-    return `rgb(${ [...arguments] })`;
-}
 
-function general_fill(context) {
-    context.fillStyle = rgb([...arguments].slice(1));
-    context.fill();
-}
-
-function fill() {
-    general_fill(ctx, ...arguments);
-}
-function background_fill() {
-    general_fill(background_ctx, ...arguments);
-}
-
-function general_stroke(context) {
-    context.strokeStyle = rgb([...arguments].slice(1));
-    context.stroke();
-}
-
-function stroke() {
-    general_stroke(ctx, ...arguments);
-}
-function background_stroke() {
-    general_stroke(background_ctx, ...arguments);
-}
-
-function oval() {
-    //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
-    beginPath();
-    ctx.ellipse(...arguments, 0, full_rot);
-}
-
-function fillRect() {
-    ctx.fillRect(...arguments);
-}
-
-function background_rect() {
-    background_ctx.rect(...arguments);
-}
-
-function background_fillRect() {
-    background_ctx.fillRect(...arguments);
-}
-
-function background_strokeRect() {
-    background_ctx.strokeRect(...arguments);
-}
-
-function general_beginPath(context) {
-    context.beginPath(...[...arguments].slice(1));
-}
-
-function beginPath() {
-    general_beginPath(ctx);
-}
-function background_beginPath() {
-    general_beginPath(background_ctx);
-}
-
-/*
-function strokeFillRect() {
-    fillRect(...arguments);
-    ctx.strokeRect(...arguments);
-}
-*/
 
 function pipe_rect(x, y, width, height, spout, flip) {
     let shade_pipe = (x, w) => fillRect(x, y, w, height);
@@ -316,13 +295,18 @@ function pipe_pair(x, y) {
     pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
 }
 
+
+
 let game_x = 0;//width * 1.5;
 let pipe_x = 0;
 let start;
 let deltaTime;
 let player_y = height / 2;
 let player_vel_y = 0;
-let player_terminal_vel_y = 5;
+let player_terminal_vel_y = 9;
+let player_width = 25;
+let horizontal_pipe_gap = 200;
+let player_rot;
 
 // Draw
 let draw = () => {
@@ -341,40 +325,41 @@ let draw = () => {
     // 156 230 89 (Grass stripe)
 
     // Draw the pipes
-    let pipe_gap = 200;
 
     // 186 235 191 for the windows
 
     // Draw the pipes
     temp = seed;
-    for (let x = game_x - pipe_x; x < width; x += pipe_gap)
+    for (let x = game_x - pipe_x; x < width; x += horizontal_pipe_gap)
         pipe_pair(x, height * (0.1 + random() * 0.4));
     seed = temp;
     // Start rendering from first visible pipe
-    if (-game_x + pipe_x > pipe_gap) {
-        pipe_x -= pipe_gap;
+    if (-game_x + pipe_x > horizontal_pipe_gap) {
+        pipe_x -= horizontal_pipe_gap;
         random();
     }
 
-    let player_width = 25;
     // Draw the player
-    beginPath();
-    let rot = player_vel_y / player_terminal_vel_y / 2; // 23 deg aka ~0.4 rad for max upper rot and directly vertical for min rot
-    console.log(rot);
-    oval(width / 2 - player_width, player_y, player_width, 20, rot, 0, full_rot);
+    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
+    oval(width / 2 - player_width, player_y, player_width, 20, player_rot, 0, full_rot);
     fill(255, 0, 0);
+    beginPath();
     // Apply gravity
-    player_vel_y += 0.25;
+    player_vel_y += 0.5;
     if (player_vel_y > player_terminal_vel_y)
         player_vel_y = player_terminal_vel_y;
     player_y += player_vel_y;
 
-    game_x -= 3;
+    game_x -= 2;
 
     window.requestAnimationFrame(draw);
 }
 draw();
 
-addEventListener("mousedown", (event) => {
-    player_vel_y = -10;
+let jump = () => player_vel_y = -9;
+
+addEventListener("keydown", (event) => {
+    if (event.key == " ")
+        jump();
 });
+addEventListener("mousedown", jump);
