@@ -207,6 +207,116 @@ let resize = () => {
     }
     seed = temp;
 
+    beginPath(); // 25 to 20 and 4 to 
+
+    // 7 different colors
+
+    let bird_colors = [
+        0, 0, 0, // Transparent 0
+        83, 56, 70, // Outline Black 1
+        212, 191, 39, // Body Yellow 2
+        235, 252, 221, // Eye White 3
+        234, 80, 64, // Beak Orange 4
+        228, 129, 22, // Shadow Yellow 5
+        221, 226, 177, // Highlight Yellow 6
+        200, 192, 192 // Shadow Grey 7
+    ];
+
+    // <Color> <Num Pixels>
+    let bird_rowscan_data = [
+        // Row 0
+        0, 6,
+        1, 6,
+        // Row 0-1 Gap
+        0, 9,
+        // Row 1
+        1, 2,
+        6, 3,
+        1, 1,
+        3, 2,
+        1, 1,
+        // Row 1-2 Gap
+        0, 7,
+        // Row 2
+        1, 1,
+        6, 2,
+        2, 2,
+        1, 1,
+        3, 4,
+        1, 1,
+        // Row 2-3 Gap
+        0, 5,
+        // Row 3
+        1, 1,
+        6, 1,
+        2, 4,
+        1, 1,
+        7, 1,
+        3, 2,
+        1, 1,
+        3, 1,
+        1, 1,
+        // Row 3-4 Gap
+        0, 3,
+        // Row 4
+        1, 1,
+        2, 6,
+        1, 1,
+        7, 1,
+        3, 2,
+        1, 1,
+        3, 1,
+        1, 1,
+        // Row 4-5 Gap
+        0, 3,
+        // Row 5
+        1, 6,
+        2, 2,
+        1, 1,
+        7, 1,
+        3, 3,
+        1, 1,
+        // Row 5-6 Gap *5 only
+        0, 2,
+        // Row 6
+        1, 1,
+        6, 5,
+        1, 1,
+        2, 3,
+        1, 6,
+        // Row 6-7 Gap *6 only
+        0, 1,
+        // Row 7
+        1, 1,
+        2, 1,
+        6, 3,
+        2, 1,
+        1, 1,
+        2, 2,
+        1, 1,
+        4, 6,
+        1, 1,
+        // Row 7-8 *8 only
+        0, 1,
+        // Row 8
+        1, 5,
+        5, 2,
+        1, 1,
+        4, 1,
+        1, 6,
+        // Row 8-9
+        0, 1,
+    ];
+
+    let bird_imagedata = [];
+    for (let i = 0; i < bird_rowscan_data.length; i += 2)
+        for (let j = 0; j < bird_rowscan_data[i + 1]; j++) {
+            const color_index = bird_rowscan_data[i] * 3;
+            bird_imagedata.push(...[...bird_colors.slice(color_index, color_index + 3), color_index == 0 ? 0 : 255]);
+        }
+    // 17 12
+    background_ctx.putImageData(new ImageData(new Uint8ClampedArray(bird_imagedata), 17, 9), 1, 1);
+
     // Test bush
     /*
     background_beginPath(); // Without begin and end path everything turns green
@@ -330,8 +440,8 @@ let draw = () => {
 
     // Draw the pipes
     temp = seed;
-    for (let x = game_x - pipe_x; x < width; x += horizontal_pipe_gap)
-        pipe_pair(x, height * (0.1 + random() * 0.4));
+    for (let x = game_x - pipe_x; x < width; x += horizontal_pipe_gap);
+        //pipe_pair(x, height * (0.1 + random() * 0.4));
     seed = temp;
     // Start rendering from first visible pipe
     if (-game_x + pipe_x > horizontal_pipe_gap) {
