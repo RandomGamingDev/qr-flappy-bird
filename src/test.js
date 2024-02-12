@@ -222,6 +222,7 @@ let resize = () => {
         200, 192, 192 // Shadow Grey 7
     ];
 
+    /*
     // <Color> <Num Pixels>
     let bird_rowscan_data = [
         // Row 0
@@ -316,6 +317,7 @@ let resize = () => {
         }
     // 17 12
     background_ctx.putImageData(new ImageData(new Uint8ClampedArray(bird_imagedata), 17, 9), 1, 1);
+    */
 
     // Test bush
     /*
