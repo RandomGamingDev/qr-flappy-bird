@@ -14,6 +14,8 @@ let pi = Math.PI;
 let full_rot = 2 * pi;
 let dynamic_floor_start;
 let dynamic_dirt_start;
+let i;
+let j;
 let temp;
 let seed = Math.random();
 let width;
@@ -31,14 +33,13 @@ let spout_height = 37;
 let edge_color = [84, 56, 71];
 
 // Lambdas
+let to_string = String;
 let rgb = a => `rgb(${ a })`;
 
 let background_bar = (color, y, height) => {
     background_fill(...color);
     background_fillRect(0, y, background_width, height);
 }
-
-let background_pxbar = (fill, y) => background_bar(fill, y, 1);
 
 let floor = x => Math.floor(x);
 let random = _ => (seed = Math.sin(seed) * 10000) - floor(seed);
@@ -75,8 +76,8 @@ let background_strokeRect = (...args) => background_ctx.strokeRect(...args);
 
 let general_beginPath = (context, ...args) => context.beginPath(...args);
 
-let beginPath = () => general_beginPath(ctx);
-let background_beginPath = () => general_beginPath(background_ctx);
+let beginPath = _ => general_beginPath(ctx);
+let background_beginPath = _ => general_beginPath(background_ctx);
 
 let add_event_listener = addEventListener;
 
@@ -112,7 +113,14 @@ function strokeFillRect() {
 */
 
 // Events (there's something that went wrong here)
-let resize = () => {
+let sky_fill = [112, 197, 205, 255];
+let cloud_fill = [234, 253, 219, 255];
+let cloud_radius = 16;
+let cloud_base;
+let bush_base;
+let bush_fill = [130, 228, 140];
+let bush_radius = 8;
+let resize = _ => {
     // Set the widths and heights
     // For the main canvas
     width = c.width = innerWidth;
@@ -123,89 +131,70 @@ let resize = () => {
 
     // Render the background
     // Background's background
-    background_fill(112, 197, 205);
+    background_fill(...sky_fill);
     background_fillRect(0, 0, background_width, background_height);
 
     // Background clouds
-    let cloud_fill = [234, 253, 219, 255];
-    let cloud_radius = 16;
-    let cloud_base = floor(background_height * 0.7);
+    cloud_base = floor(background_height * 0.7);
     // Set the seed for generating the clouds
     temp = seed;
     seed = 5;
     background_beginPath(); // Without begin and end path everything turns green
-    for (let x = 0; x <= background_width; x += cloud_radius)
-        background_ctx.arc(x, cloud_base + random() * cloud_radius, cloud_radius, 0, full_rot);
+    for (i = 0; i <= background_width; i += cloud_radius) // Iterates over x
+        background_ctx.arc(i, cloud_base + random() * cloud_radius, cloud_radius, 0, full_rot);
     background_fill(...cloud_fill);
     background_beginPath();
     seed = temp;
 
     // Remove the clouds' aliasing effects
-    for (let x = 0; x < background_width; x++)
-        for (let y = cloud_base - cloud_radius; y < cloud_base; y++)
-            if (!["112,197,205,255", String(cloud_fill)].includes(String(background_ctx.getImageData(x, y, 1, 1).data)))
-                background_ctx.putImageData(new ImageData(new Uint8ClampedArray(cloud_fill), 1, 1), x, y);
+    for (i = 0; i < background_width; i++) // Iterates over x
+        for (j = cloud_base - cloud_radius; j < cloud_base; j++) // Iterates over y
+            if (![to_string(sky_fill), to_string(cloud_fill)].includes(to_string(background_ctx.getImageData(i, j, 1, 1).data)))
+                background_ctx.putImageData(new ImageData(new Uint8ClampedArray(cloud_fill), 1, 1), i, j);
 
     dynamic_floor_start = floor(background_height * 0.875);
     dynamic_dirt_start = floor(background_height * 0.895);
 
-    /*
-    // Top black line (scale up pixel spefic by 3)
-    background_pxbar(edge_color, dynamic_floor_start);
-    // Glistening Green
-    background_pxbar([228, 253, 139], dynamic_floor_start + 1);
-    // Grass underside
-    background_pxbar([85, 128, 34], dynamic_dirt_start + 2);
-    // Grass shadow
-    background_pxbar([215, 168, 76], dynamic_dirt_start + 3);
-    */
-    
+    for (i = 0; i < 4; i++)
+        background_bar([
+            edge_color,
+            [228, 253, 139],
+            [85, 128, 34],
+            [215, 168, 76]
+        ][i], (i < 2 ? dynamic_floor_start : dynamic_dirt_start) + i, 1);
 
     // Dirt
     background_bar([222, 216, 149], dynamic_dirt_start + 4, background_height - dynamic_dirt_start - 4);
     // Fill in the cloud base
     background_bar(cloud_fill, cloud_base, dynamic_floor_start - cloud_base);
 
-    let bush_base = floor(background_height * 0.82);
+    bush_base = floor(background_height * 0.82);
+
+    background_ctx.lineWidth = 2;
 
     // Buildings
-    for (let x = 0; x <= background_width; x += 39) {
-        background_ctx.lineWidth = 2;
-        background_beginPath();
-
-        // Left building
-        background_rect(x - 22, bush_base - 14, 9, 14);
-        background_rect(x - 18, bush_base - 17, 5, 2);
-
-
-        // Middle building
-        background_rect(x - 9, bush_base - 19, 8, 19);
-        background_rect(x - 4, bush_base - 21, 3, 2);
-        // Right building
-        background_rect(x, bush_base - 15, 7, 15);
-        background_rect(x, bush_base - 17, 3, 1);
-       
-        /*
-        for (let rect of 
+    for (i = 0; i <= background_width; i += 39)
+        for (j of 
                 // x, y & height, width
                 [
-                    [22, 14, 9],
-                    [9, 19, 8],
-                    [0, 15, 7],
+                    // Building tops
+                    [18, 17, 5], // Left building
+                    [4, 21, 3], // Middle building
+                    [0, 17, 3], // Right build
+
+                    // Main buildings
+                    [22, 14, 9], // Left building
+                    [9, 19, 8], // Middle building
+                    [0, 15, 7], // Right building
+                    [14, 9, 4]
                 ]
-            )
-            background_rect(x - rect[0], bush_base_start - rect[1], rect[2], rect[1]);
-        */
+            ) {
+            background_beginPath();
+            background_rect(i - j[0], bush_base - j[1], j[2], j[1]);
+            background_stroke(161, 214, 215);
+            background_fill(216, 243, 204);
+        }
 
-        background_stroke(161, 214, 215);
-        background_fill(216, 243, 204);
-
-        // Bottom left building
-        background_beginPath();
-        background_rect(x - 14, bush_base - 9, 4, 9);
-        background_stroke(161, 214, 215);
-        background_fill(216, 243, 204);
-    }
     background_beginPath();
 
     // Building Windows
@@ -213,24 +202,21 @@ let resize = () => {
     for (let x = 0; x < background_width; x += 2)
         for (let y = 0; y < background_height; y += 3)
             if (String(background_ctx.getImageData(x, y, 1, 1).data) == "216,243,204,255")
-                for (let i = 0; i < 2; i++)
+                for (i = 0; i < 2; i++)
                     background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, 255]), 1, 1), x, y + i);
     */
 
     // Bushes
     // Bush base
-    background_bar([130, 228, 140], bush_base, dynamic_floor_start - bush_base);
+    background_bar(bush_fill, bush_base, dynamic_floor_start - bush_base);
 
-    let bush_stroke = [];
-    let bush_fill = [130, 228, 140, 255];
-    let bush_radius = 8;
     // Set the seed for generating the bushes (don't add antialiasing to keep the bushes "furry")
     temp = seed;
     seed = 10;
-    for (let y = 0; y < 5; y++) {
-        for (let x = -random() * 28; x <= background_width; x += 28) {
+    for (i = 0; i < 5; i++) { // Iterates over y
+        for (j = -random() * 28; j <= background_width; j += 28) { // Iterates over x
             background_beginPath(); // Without begin and end path everything turns green
-            background_ctx.arc(x, bush_base + 2 * y, bush_radius, 0, pi, true);
+            background_ctx.arc(j, bush_base + 2 * i, bush_radius, 0, pi, true);
             background_stroke(109, 202, 135);
             background_fill(...bush_fill);
             background_beginPath();
@@ -240,14 +226,13 @@ let resize = () => {
 
     beginPath();
 };
-resize();
-add_event_listener("resize", resize);
 
 // Functions
+let spout_x = resize(); // Call resize here to avoid an extra let since it returns undefined anyways
 let pipe_pair = (x, y, collide) => {
     ctx.lineWidth = 3;
 
-    let spout_x = x - 3;
+    spout_x = x - 3;
     
     // Top pipe pipe & spout
     pipe_rect(x, -3, pipe_width, y + 3);
@@ -272,7 +257,7 @@ let pipe_x = 0;
 let start;
 let deltaTime;
 let player_y = height / 2;
-let calc_player_x = () => width / 2 - player_width;
+let calc_player_x = _ => width / 2 - player_width;
 let player_vel_y = 0;
 let player_terminal_vel_y = 9;
 let player_width = 25;
@@ -281,7 +266,7 @@ let horizontal_pipe_gap = 200;
 let player_rot;
 
 // Draw
-let draw = () => {
+let draw = _ => {
     deltaTime = new Date() - start ? start : 0;
     start = new Date();
 
@@ -303,8 +288,8 @@ let draw = () => {
 
     // Draw the pipes
     temp = seed;
-    for (let x = game_x - pipe_x; x < width; x += horizontal_pipe_gap)
-        pipe_pair(x, height * (0.1 + random() * 0.4), Math.abs(x - (width / 2 - player_width) + pipe_width / 2) - player_width < pipe_width / 2);
+    for (i = game_x - pipe_x; i < width; i += horizontal_pipe_gap) // Iterates over x
+        pipe_pair(i, height * (0.1 + random() * 0.4), Math.abs(i - (width / 2 - player_width) + pipe_width / 2) - player_width < pipe_width / 2);
     seed = temp;
     // Start rendering from first visible pipe
     if (-game_x + pipe_x > horizontal_pipe_gap) {
@@ -328,19 +313,24 @@ let draw = () => {
 
     requestAnimationFrame(draw);
 }
-draw();
+let jump = _ => player_vel_y = -9;
 
-let jump = () => player_vel_y = -9;
+let shade_pipe;
+let pipe_right_x;
+let sides;
+let outer_side;
 
 add_event_listener("keydown", (event) => {
     if (event.key == " ")
         jump();
 });
 add_event_listener("mousedown", jump);
+add_event_listener("resize", resize);
+draw();
 
 // The function's at the end so that everything can be in 1 let
 function pipe_rect(x, y, width, height, spout, flip) {
-    let shade_pipe = (x, w) => fillRect(x, y, w, height);
+    shade_pipe = (x, w) => fillRect(x, y, w, height);
 
     // Main body
     fill(115, 191, 46);
@@ -358,7 +348,7 @@ function pipe_rect(x, y, width, height, spout, flip) {
     fillRect(x + 3, y, 3, height);
 
     // Scale by left
-    let pipe_right_x = x + width;
+    pipe_right_x = x + width;
 
     // Shadows
     fill(85, 128, 34);
@@ -368,8 +358,8 @@ function pipe_rect(x, y, width, height, spout, flip) {
     shade_pipe(pipe_right_x - 8, 6);
 
     if (spout) {
-        let sides = [y, y + height - 4]
-        let outer_side = flip ? sides[0] : sides[1];
+        sides = [y, y + height - 4]
+        outer_side = flip ? sides[0] : sides[1];
         // Dark
         fill(85, 128, 34);
         sides.forEach(shadow_y => fillRect(x, shadow_y, width, 3));
