@@ -1,11 +1,8 @@
 // Init
 let d = document;
-d.body.style = "margin:0";
 
 // Main Canvas
 let c = d.createElement("canvas");
-c.style = "display:block"
-d.body.appendChild(c);
 let ctx = c.getContext("2d");
 
 // Pixelated Background Canvas
@@ -24,6 +21,11 @@ let height;
 let background_width;
 let background_height;
 let pipe_width = 74;
+// Pipe parameters
+let pipe_gap = 157;
+// Pipe parameters
+let spout_width = 80;
+let spout_height = 37;
 
 // Colors
 let edge_color = [84, 56, 71];
@@ -31,15 +33,15 @@ let edge_color = [84, 56, 71];
 // Lambdas
 let rgb = a => `rgb(${ a })`;
 
-let background_bar = (fill, y, height) => {
-    background_fill(...fill);
+let background_bar = (color, y, height) => {
+    background_fill(...color);
     background_fillRect(0, y, background_width, height);
 }
 
 let background_pxbar = (fill, y) => background_bar(fill, y, 1);
 
-let floor = (x) => Math.floor(x);
-let random = () => (seed = Math.sin(seed) * 10000) - floor(seed);
+let floor = x => Math.floor(x);
+let random = _ => (seed = Math.sin(seed) * 10000) - floor(seed);
 
 let general_fill = (context, ...args) => {
     context.fillStyle = rgb(args);
@@ -76,6 +78,32 @@ let general_beginPath = (context, ...args) => context.beginPath(...args);
 let beginPath = () => general_beginPath(ctx);
 let background_beginPath = () => general_beginPath(background_ctx);
 
+let add_event_listener = addEventListener;
+
+// Calculate whether between the and a pipe are touching
+let calc_col = (x, y, w, h) => { // Maybe use ...args?
+    console.log("calc_col NOT IMPLEMENTED YET");
+    /*
+    let player_x = calc_player_x();
+    for (let a = 0; a < full_rot; a += 0.01) {
+        for (let i = 0; i < 2; i++) {
+            let trig_func
+        }
+    }
+    */
+    /*
+    for (let a = 0; a < full_rot; a += 0.01) {
+        const prerot_point = [player_x + player_width / 2 * cos(a), player_y + player_height / 2 * sin(a)];
+        const dist_from_origin = Math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
+        const new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + r;
+        const new_point = [dist_from_origin * cos(new_rot), dist_from_origin * sin(new_rot)]
+        
+        if (new_point[0] > rx && new_point[0] < rx + rw && new_point[1] > ry && new_point[1] < ry + rh)
+          return true;
+    }
+    */
+} 
+
 /*
 function strokeFillRect() {
     fillRect(...arguments);
@@ -87,8 +115,8 @@ function strokeFillRect() {
 let resize = () => {
     // Set the widths and heights
     // For the main canvas
-    width = c.width = window.innerWidth;
-    height = c.height = window.innerHeight;
+    width = c.width = innerWidth;
+    height = c.height = innerHeight;
     // For the background canvas
     background_width = background_canvas.width = floor(width / 3);
     background_height = background_canvas.height = floor(height / 3);
@@ -121,6 +149,7 @@ let resize = () => {
     dynamic_floor_start = floor(background_height * 0.875);
     dynamic_dirt_start = floor(background_height * 0.895);
 
+    /*
     // Top black line (scale up pixel spefic by 3)
     background_pxbar(edge_color, dynamic_floor_start);
     // Glistening Green
@@ -129,6 +158,8 @@ let resize = () => {
     background_pxbar([85, 128, 34], dynamic_dirt_start + 2);
     // Grass shadow
     background_pxbar([215, 168, 76], dynamic_dirt_start + 3);
+    */
+    
 
     // Dirt
     background_bar([222, 216, 149], dynamic_dirt_start + 4, background_height - dynamic_dirt_start - 4);
@@ -193,7 +224,7 @@ let resize = () => {
     let bush_stroke = [];
     let bush_fill = [130, 228, 140, 255];
     let bush_radius = 8;
-    // Set the seed for generating the clouds
+    // Set the seed for generating the bushes (don't add antialiasing to keep the bushes "furry")
     temp = seed;
     seed = 10;
     for (let y = 0; y < 5; y++) {
@@ -207,134 +238,107 @@ let resize = () => {
     }
     seed = temp;
 
-    beginPath(); // 25 to 20 and 4 to 
-
-    // 7 different colors
-
-    let bird_colors = [
-        0, 0, 0, // Transparent 0
-        83, 56, 70, // Outline Black 1
-        212, 191, 39, // Body Yellow 2
-        235, 252, 221, // Eye White 3
-        234, 80, 64, // Beak Orange 4
-        228, 129, 22, // Shadow Yellow 5
-        221, 226, 177, // Highlight Yellow 6
-        200, 192, 192 // Shadow Grey 7
-    ];
-
-    /*
-    // <Color> <Num Pixels>
-    let bird_rowscan_data = [
-        // Row 0
-        0, 6,
-        1, 6,
-        // Row 0-1 Gap
-        0, 9,
-        // Row 1
-        1, 2,
-        6, 3,
-        1, 1,
-        3, 2,
-        1, 1,
-        // Row 1-2 Gap
-        0, 7,
-        // Row 2
-        1, 1,
-        6, 2,
-        2, 2,
-        1, 1,
-        3, 4,
-        1, 1,
-        // Row 2-3 Gap
-        0, 5,
-        // Row 3
-        1, 1,
-        6, 1,
-        2, 4,
-        1, 1,
-        7, 1,
-        3, 2,
-        1, 1,
-        3, 1,
-        1, 1,
-        // Row 3-4 Gap
-        0, 3,
-        // Row 4
-        1, 1,
-        2, 6,
-        1, 1,
-        7, 1,
-        3, 2,
-        1, 1,
-        3, 1,
-        1, 1,
-        // Row 4-5 Gap
-        0, 3,
-        // Row 5
-        1, 6,
-        2, 2,
-        1, 1,
-        7, 1,
-        3, 3,
-        1, 1,
-        // Row 5-6 Gap *5 only
-        0, 2,
-        // Row 6
-        1, 1,
-        6, 5,
-        1, 1,
-        2, 3,
-        1, 6,
-        // Row 6-7 Gap *6 only
-        0, 1,
-        // Row 7
-        1, 1,
-        2, 1,
-        6, 3,
-        2, 1,
-        1, 1,
-        2, 2,
-        1, 1,
-        4, 6,
-        1, 1,
-        // Row 7-8 *8 only
-        0, 1,
-        // Row 8
-        1, 5,
-        5, 2,
-        1, 1,
-        4, 1,
-        1, 6,
-        // Row 8-9
-        0, 1,
-    ];
-
-    let bird_imagedata = [];
-    for (let i = 0; i < bird_rowscan_data.length; i += 2)
-        for (let j = 0; j < bird_rowscan_data[i + 1]; j++) {
-            const color_index = bird_rowscan_data[i] * 3;
-            bird_imagedata.push(...[...bird_colors.slice(color_index, color_index + 3), color_index == 0 ? 0 : 255]);
-        }
-    // 17 12
-    background_ctx.putImageData(new ImageData(new Uint8ClampedArray(bird_imagedata), 17, 9), 1, 1);
-    */
-
-    // Test bush
-    /*
-    background_beginPath(); // Without begin and end path everything turns green
-    background_ctx.arc(100, 270, 8, 0, pi, true);
-    background_ctx.lineWidth = 2;
-    background_stroke(110, 203, 136);
-    background_fill(130, 228, 140);
-    background_beginPath();
-    */
+    beginPath();
 };
 resize();
-window.addEventListener("resize", resize);
+add_event_listener("resize", resize);
 
 // Functions
+let pipe_pair = (x, y, collide) => {
+    ctx.lineWidth = 3;
+
+    let spout_x = x - 3;
+    
+    // Top pipe pipe & spout
+    pipe_rect(x, -3, pipe_width, y + 3);
+    pipe_rect(spout_x, y - spout_height, spout_width, spout_height, 1);
+    // Bottom pipe pipe & spout
+    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
+    pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
+
+    // Test for collisions against the player
+    if (collide) {
+        calc_col();
+
+        // Replaces all fillRect with calc_col once it's done
+        fill(255, 0, 0);
+        fillRect(x, -3, pipe_width, y + 3);
+        fillRect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
+    }
+}
+
+let game_x = 0;//width * 0.75;
+let pipe_x = 0;
+let start;
+let deltaTime;
+let player_y = height / 2;
+let calc_player_x = () => width / 2 - player_width;
+let player_vel_y = 0;
+let player_terminal_vel_y = 9;
+let player_width = 25;
+let player_height = 20;
+let horizontal_pipe_gap = 200;
+let player_rot;
+
+// Draw
+let draw = () => {
+    deltaTime = new Date() - start ? start : 0;
+    start = new Date();
+
+    // Background
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(background_canvas, 0, 0, width, height);
+
+    // Grass base
+    background_fill(115, 191, 46);
+    background_fillRect(0, dynamic_floor_start + 2, background_width, dynamic_dirt_start - dynamic_floor_start);
+
+    //background_fill(255, 0, 0);
+    // 156 230 89 (Grass stripe)
+
+    // Draw the pipes
+
+    // 186 235 191 for the windows
 
 
+    // Draw the pipes
+    temp = seed;
+    for (let x = game_x - pipe_x; x < width; x += horizontal_pipe_gap)
+        pipe_pair(x, height * (0.1 + random() * 0.4), Math.abs(x - (width / 2 - player_width) + pipe_width / 2) - player_width < pipe_width / 2);
+    seed = temp;
+    // Start rendering from first visible pipe
+    if (-game_x + pipe_x > horizontal_pipe_gap) {
+        pipe_x -= horizontal_pipe_gap;
+        random();
+    }
+
+    // Draw the player
+    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
+    oval(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
+    fill(255, 0, 0);
+    beginPath();
+    // Apply gravity
+    //player_vel_y += 0.5;
+    if (player_vel_y > player_terminal_vel_y)
+        player_vel_y = player_terminal_vel_y;
+    player_y += player_vel_y;
+
+    //game_x -= 2;
+    game_x -= 0.5;
+
+    requestAnimationFrame(draw);
+}
+draw();
+
+let jump = () => player_vel_y = -9;
+
+add_event_listener("keydown", (event) => {
+    if (event.key == " ")
+        jump();
+});
+add_event_listener("mousedown", jump);
+
+// The function's at the end so that everything can be in 1 let
 function pipe_rect(x, y, width, height, spout, flip) {
     let shade_pipe = (x, w) => fillRect(x, y, w, height);
 
@@ -389,89 +393,7 @@ function pipe_rect(x, y, width, height, spout, flip) {
     ctx.strokeRect(...arguments);
 }
 
-function pipe_pair(x, y) {
-    ctx.lineWidth = 3;
-
-    // Pipe parameters
-    let pipe_gap = 157;
-    // Pipe parameters
-    let spout_x = x - 3;
-    let spout_width = 80;
-    let spout_height = 37;
-    
-    // Top pipe pipe & spout
-    pipe_rect(x, -3, pipe_width, y + 3);
-    pipe_rect(spout_x, y - spout_height, spout_width, spout_height, 1);
-    // Bottom pipe pipe & spout
-    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
-    pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
-}
-
-
-
-let game_x = 0;//width * 1.5;
-let pipe_x = 0;
-let start;
-let deltaTime;
-let player_y = height / 2;
-let player_vel_y = 0;
-let player_terminal_vel_y = 9;
-let player_width = 25;
-let horizontal_pipe_gap = 200;
-let player_rot;
-
-// Draw
-let draw = () => {
-    deltaTime = new Date() - start ? start : 0;
-    start = new Date();
-
-    // Background
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(background_canvas, 0, 0, width, height);
-
-    // Grass base
-    background_fill(115, 191, 46);
-    background_fillRect(0, dynamic_floor_start + 2, background_width, dynamic_dirt_start - dynamic_floor_start);
-
-    //background_fill(255, 0, 0);
-    // 156 230 89 (Grass stripe)
-
-    // Draw the pipes
-
-    // 186 235 191 for the windows
-
-    // Draw the pipes
-    temp = seed;
-    for (let x = game_x - pipe_x; x < width; x += horizontal_pipe_gap);
-        //pipe_pair(x, height * (0.1 + random() * 0.4));
-    seed = temp;
-    // Start rendering from first visible pipe
-    if (-game_x + pipe_x > horizontal_pipe_gap) {
-        pipe_x -= horizontal_pipe_gap;
-        random();
-    }
-
-    // Draw the player
-    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
-    oval(width / 2 - player_width, player_y, player_width, 20, player_rot, 0, full_rot);
-    fill(255, 0, 0);
-    beginPath();
-    // Apply gravity
-    player_vel_y += 0.5;
-    if (player_vel_y > player_terminal_vel_y)
-        player_vel_y = player_terminal_vel_y;
-    player_y += player_vel_y;
-
-    game_x -= 2;
-
-    window.requestAnimationFrame(draw);
-}
-draw();
-
-let jump = () => player_vel_y = -9;
-
-addEventListener("keydown", (event) => {
-    if (event.key == " ")
-        jump();
-});
-addEventListener("mousedown", jump);
+// The initialization stuff's at the end so everything can be one let and for clarity
+d.body.style = "margin:0";
+c.style = "display:block"
+d.body.appendChild(c);
