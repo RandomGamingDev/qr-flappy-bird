@@ -332,6 +332,7 @@ draw();
 function pipe_rect(x, y, width, height, spout, flip) {
     shade_pipe = (x, w) => fillRect(x, y, w, height);
 
+    /*
     // Main body
     fill(115, 191, 46);
     shade_pipe(x, width);
@@ -356,6 +357,7 @@ function pipe_rect(x, y, width, height, spout, flip) {
     shade_pipe(pipe_right_x - 14, 3);
     // Right shadow
     shade_pipe(pipe_right_x - 8, 6);
+    */
 
     if (spout) {
         sides = [y, y + height - 4]
