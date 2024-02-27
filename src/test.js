@@ -41,7 +41,9 @@ let background_bar = (color, y, height) => {
     background_fillRect(0, y, background_width, height);
 }
 
-let floor = x => Math.floor(x);
+let floor = Math.floor;
+let cos = Math.cos;
+let sin = Math.sin;
 let random = _ => (seed = Math.sin(seed) * 10000) - floor(seed);
 
 let general_fill = (context, ...args) => {
@@ -82,27 +84,24 @@ let background_beginPath = _ => general_beginPath(background_ctx);
 let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
-let calc_col = (x, y, w, h) => { // Maybe use ...args?
-    console.log("calc_col NOT IMPLEMENTED YET");
-    /*
-    let player_x = calc_player_x();
-    for (let a = 0; a < full_rot; a += 0.01) {
-        for (let i = 0; i < 2; i++) {
-            let trig_func
-        }
-    }
-    */
-    /*
+let player_x;
+let calc_col = (rx, ry, rw, rh) => { // Maybe use ...args?
+    //console.log("calc_col NOT IMPLEMENTED YET");
+    player_x = calc_player_x();
+
+    // player_rot
+
     for (let a = 0; a < full_rot; a += 0.01) {
         const prerot_point = [player_x + player_width / 2 * cos(a), player_y + player_height / 2 * sin(a)];
         const dist_from_origin = Math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
-        const new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + r;
+        const new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
         const new_point = [dist_from_origin * cos(new_rot), dist_from_origin * sin(new_rot)]
         
         if (new_point[0] > rx && new_point[0] < rx + rw && new_point[1] > ry && new_point[1] < ry + rh)
           return true;
     }
-    */
+    return false;
+    //*/
 } 
 
 /*
@@ -199,11 +198,11 @@ let resize = _ => {
 
     // Building Windows
     /*
-    for (let x = 0; x < background_width; x += 2)
-        for (let y = 0; y < background_height; y += 3)
-            if (String(background_ctx.getImageData(x, y, 1, 1).data) == "216,243,204,255")
-                for (i = 0; i < 2; i++)
-                    background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, 255]), 1, 1), x, y + i);
+    for (i = 0; i < background_width; i += 2)
+        for (j = 0; j < background_height; j += 3)
+            for (temp = 0; temp < 2; temp++)
+                if (to_string(background_ctx.getImageData(i, j + temp, 1, 1).data) == "216,243,204,255")
+                    background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, 255]), 1, 1), i, j + temp);
     */
 
     // Bushes
@@ -245,8 +244,11 @@ let pipe_pair = (x, y, collide) => {
     if (collide) {
         calc_col();
 
+
         // Replaces all fillRect with calc_col once it's done
         fill(255, 0, 0);
+        if (calc_col(x, -3, pipe_width, y + 3) || calc_col(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4))
+            fill(0, 255, 0);
         fillRect(x, -3, pipe_width, y + 3);
         fillRect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
     }
@@ -303,7 +305,7 @@ let draw = _ => {
     fill(255, 0, 0);
     beginPath();
     // Apply gravity
-    //player_vel_y += 0.5;
+    player_vel_y += 0.5;
     if (player_vel_y > player_terminal_vel_y)
         player_vel_y = player_terminal_vel_y;
     player_y += player_vel_y;
