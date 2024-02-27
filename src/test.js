@@ -92,13 +92,20 @@ let calc_col = (rx, ry, rw, rh) => { // Maybe use ...args?
     // player_rot
 
     for (let a = 0; a < full_rot; a += 0.01) {
-        const prerot_point = [player_x + player_width / 2 * cos(a), player_y + player_height / 2 * sin(a)];
+        const prerot_point = [player_x + player_width * cos(a), player_y + player_height * sin(a)];
         const dist_from_origin = Math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
         const new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
+        console.log(player_rot);
         const new_point = [dist_from_origin * cos(new_rot), dist_from_origin * sin(new_rot)]
+        oval(...new_point, 1, 1, 0);
         
+        //oval(...new_point, 1, 1, 0);
+        fill(0, 0, 255);
+        beginPath();
+        /*
         if (new_point[0] > rx && new_point[0] < rx + rw && new_point[1] > ry && new_point[1] < ry + rh)
           return true;
+        */
     }
     return false;
     //*/
@@ -301,7 +308,7 @@ let draw = _ => {
 
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
-    oval(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
+    //oval(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
     fill(255, 0, 0);
     beginPath();
     // Apply gravity
