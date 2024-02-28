@@ -85,32 +85,24 @@ let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
 let player_x;
-let calc_col = (rx, ry, rw, rh) => { // Maybe use ...args?
-    //console.log("calc_col NOT IMPLEMENTED YET");
+let prerot_point;
+let dist_from_origin;
+let new_rot;
+let new_point
+let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
-
-    // player_rot
-
-    for (let a = 0; a < full_rot; a += 0.01) {
-        const prerot_point = [player_width * cos(a), player_height * sin(a)];
-        const dist_from_origin = Math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
-        const new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
-        console.log(player_rot);
-        const new_point = [player_x + dist_from_origin * cos(new_rot), player_y + dist_from_origin * sin(new_rot)]
+    
+    for (let a = 0; a < full_rot; a += 0.1) {
+        prerot_point = [player_width * cos(a), player_height * sin(a)];
+        dist_from_origin = Math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
+        new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
+        new_point = [player_x + dist_from_origin * cos(new_rot), player_y + dist_from_origin * sin(new_rot)]
 
         if (new_point[0] > rx && new_point[0] < rx + rw && new_point[1] > ry && new_point[1] < ry + rh)
           return true;
     }
     return false;
-    //*/
 } 
-
-/*
-function strokeFillRect() {
-    fillRect(...arguments);
-    ctx.strokeRect(...arguments);
-}
-*/
 
 // Events (there's something that went wrong here)
 let sky_fill = [112, 197, 205, 255];
@@ -197,14 +189,14 @@ let resize = _ => {
 
     background_beginPath();
 
-    // Building Windows
     /*
+    // Building Windows
     for (i = 0; i < background_width; i += 2)
         for (j = 0; j < background_height; j += 3)
             for (temp = 0; temp < 2; temp++)
                 if (to_string(background_ctx.getImageData(i, j + temp, 1, 1).data) == "216,243,204,255")
                     background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, 255]), 1, 1), i, j + temp);
-    */
+    //*/
 
     // Bushes
     // Bush base
@@ -235,24 +227,27 @@ let pipe_pair = (x, y, collide) => {
     spout_x = x - 3;
     
     // Top pipe pipe & spout
-    pipe_rect(x, -3, pipe_width, y + 3);
-    pipe_rect(spout_x, y - spout_height, spout_width, spout_height, 1);
+    pipe_rect(x, -3, pipe_width, y + 3, collide);
+    pipe_rect(spout_x, y - spout_height, spout_width, spout_height, collide, 1, 0);
     // Bottom pipe pipe & spout
-    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
-    pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
+    pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4, collide);
+    pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, collide, 1, 1);
 
     // Test for collisions against the player
+    /*
     if (collide) {
-        calc_col();
-
-
-        // Replaces all fillRect with calc_col once it's done
         fill(255, 0, 0);
-        if (calc_col(x, -3, pipe_width, y + 3) || calc_col(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4))
+        if (calc_col(x, -3, pipe_width, y + 3) ||
+            calc_col(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4) ||
+            calc_col(spout_x, y - spout_height, spout_width, spout_height, 1) ||
+            calc_col(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1))
             fill(0, 255, 0);
         fillRect(x, -3, pipe_width, y + 3);
         fillRect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
+        fillRect(spout_x, y - spout_height, spout_width, spout_height, 1);
+        fillRect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
     }
+    */
 }
 
 let game_x = 0;//width * 0.75;
@@ -311,8 +306,7 @@ let draw = _ => {
         player_vel_y = player_terminal_vel_y;
     player_y += player_vel_y;
 
-    //game_x -= 2;
-    game_x -= 0.5;
+    game_x -= 2;
 
     requestAnimationFrame(draw);
 }
@@ -322,6 +316,10 @@ let shade_pipe;
 let pipe_right_x;
 let sides;
 let outer_side;
+let pipe_color = [115, 191, 46];
+let pipe_highlight_color = [155, 227, 89];
+let pipe_bright_highlight_color = [228, 253, 139];
+let pipe_shadow = [85, 128, 34];
 
 add_event_listener("keydown", (event) => {
     if (event.key == " ")
@@ -332,35 +330,34 @@ add_event_listener("resize", resize);
 draw();
 
 // The function's at the end so that everything can be in 1 let
-function pipe_rect(x, y, width, height, spout, flip) {
+function pipe_rect(x, y, width, height, collide, spout, flip) {
     shade_pipe = (x, w) => fillRect(x, y, w, height);
 
-    /*
+    //calc_col(...arguments)
     // Main body
-    fill(115, 191, 46);
+    calc_col(...arguments) ? fill(...pipe_color) : fill(255, 0, 0);
     shade_pipe(x, width);
 
     // Highlights
-    fill(155, 227, 89);
+    fill(...pipe_highlight_color);
     // Left highlight
     shade_pipe(x, 18);
     // Middle Left highlight strand
     shade_pipe(x + 21, 3);
 
     // Leftmost bright highlight
-    fill(228, 253, 139);
+    fill(...pipe_bright_highlight_color);
     fillRect(x + 3, y, 3, height);
 
     // Scale by left
     pipe_right_x = x + width;
 
     // Shadows
-    fill(85, 128, 34);
+    fill(...pipe_shadow);
     // Right Middle shadow strand
     shade_pipe(pipe_right_x - 14, 3);
     // Right shadow
     shade_pipe(pipe_right_x - 8, 6);
-    */
 
     if (spout) {
         sides = [y, y + height - 4]
@@ -369,23 +366,36 @@ function pipe_rect(x, y, width, height, spout, flip) {
         fill(85, 128, 34);
         sides.forEach(shadow_y => fillRect(x, shadow_y, width, 3));
 
+        for (v of [
+            pipe_highlight_color,
+            [3, 69],
+            pipe_bright_highlight_color,
+            [6, 42],
+            [51, 3],
+            pipe_color,
+            [72, 3],
+        ]) v.length == 3 ? fill(...v) : fillRect(x + v[0], outer_side, v[1], 3);
+        //*/
+
+        /*
         // Highlight
-        fill(155, 227, 89); // spout_x
+        fill(...pipe_highlight_color); // spout_x
         fillRect(x + 3, outer_side, 69, 3);
 
         // Bright highlight
-        fill(228, 253, 139);
+        fill(...pipe_bright_highlight_color);
         fillRect(x + 6, outer_side, 42, 3);
         fillRect(x + 51, outer_side, 3, 3);
 
         // Body color
-        fill(115, 191, 46);
+        fill(...pipe_color);
         fillRect(x + 72, outer_side, 3, 3);
+        //*/
     }
 
     // Outside stroke
     stroke(...edge_color);
-    ctx.strokeRect(...arguments);
+    ctx.strokeRect(...arguments)
 }
 
 // The initialization stuff's at the end so everything can be one let and for clarity
