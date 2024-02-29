@@ -295,6 +295,9 @@ let draw = _ => {
         random();
     }
 
+    if (calc_col(0, dynamic_floor_start * 3, width, 1))
+        console.log("floor!");
+
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
     oval(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
@@ -306,7 +309,8 @@ let draw = _ => {
         player_vel_y = player_terminal_vel_y;
     player_y += player_vel_y;
 
-    game_x -= 2;
+    // game_x -= 2;
+    game_x -= height * 0.002;
 
     requestAnimationFrame(draw);
 }
