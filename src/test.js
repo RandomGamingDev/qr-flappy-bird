@@ -1,23 +1,23 @@
-// Init
-let d = document;
+let get_2d_context = canvas => canvas.getContext("2d");
 
 // Main Canvas
-let c = d.createElement("canvas");
-let ctx = c.getContext("2d");
+let c = document.createElement("canvas");
+let ctx = get_2d_context(c);
 
 // Pixelated Background Canvas
 let background_canvas = new OffscreenCanvas(0, 0);
-let background_ctx = background_canvas.getContext("2d");
+let background_ctx = get_2d_context(background_canvas);
 
 // Globals
-let pi = Math.PI;
+let math = Math;
+let pi = math.PI;
 let full_rot = 2 * pi;
 let dynamic_floor_start;
 let dynamic_dirt_start;
 let i;
 let j;
 let temp;
-let seed = Math.random();
+let seed = math.random();
 let width;
 let height;
 let background_width;
@@ -41,10 +41,10 @@ let background_bar = (color, y, height) => {
     background_fillRect(0, y, background_width, height);
 }
 
-let floor = Math.floor;
-let cos = Math.cos;
-let sin = Math.sin;
-let random = _ => (seed = Math.sin(seed) * 10000) - floor(seed);
+let floor = math.floor;
+let cos = math.cos;
+let sin = math.sin;
+let random = _ => (seed = math.sin(seed) * 10000) - floor(seed);
 
 let general_fill = (context, ...args) => {
     context.fillStyle = rgb(args);
@@ -92,10 +92,10 @@ let new_point
 let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
     
-    for (let a = 0; a < full_rot; a += 0.1) {
-        prerot_point = [player_width * cos(a), player_height * sin(a)];
-        dist_from_origin = Math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
-        new_rot = Math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
+    for (i = 0; i < full_rot; i += 0.1) {
+        prerot_point = [player_width * cos(i), player_height * sin(i)];
+        dist_from_origin = math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
+        new_rot = math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
         new_point = [player_x + dist_from_origin * cos(new_rot), player_y + dist_from_origin * sin(new_rot)]
 
         if (new_point[0] > rx && new_point[0] < rx + rw && new_point[1] > ry && new_point[1] < ry + rh)
@@ -232,24 +232,9 @@ let pipe_pair = (x, y, collide) => {
     // Bottom pipe pipe & spout
     pipe_rect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4, collide);
     pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, collide, 1, 1);
-
-    // Test for collisions against the player
-    /*
-    if (collide) {
-        fill(255, 0, 0);
-        if (calc_col(x, -3, pipe_width, y + 3) ||
-            calc_col(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4) ||
-            calc_col(spout_x, y - spout_height, spout_width, spout_height, 1) ||
-            calc_col(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1))
-            fill(0, 255, 0);
-        fillRect(x, -3, pipe_width, y + 3);
-        fillRect(x, y + pipe_gap, pipe_width, 3 * dynamic_floor_start - y - pipe_gap + 4);
-        fillRect(spout_x, y - spout_height, spout_width, spout_height, 1);
-        fillRect(spout_x, y + pipe_gap, spout_width, spout_height, 1, 1);
-    }
-    */
 }
 
+let points = 0;
 let game_x = 0;//width * 0.75;
 let pipe_x = 0;
 let start;
@@ -287,7 +272,7 @@ let draw = _ => {
     // Draw the pipes
     temp = seed;
     for (i = game_x - pipe_x; i < width; i += horizontal_pipe_gap) // Iterates over x
-        pipe_pair(i, height * (0.1 + random() * 0.4), Math.abs(i - (width / 2 - player_width) + pipe_width / 2) - player_width < pipe_width / 2);
+        pipe_pair(i, height * (0.1 + random() * 0.4), math.abs(i - (width / 2 - player_width) + spout_width / 2) - player_width < pipe_width / 2);
     seed = temp;
     // Start rendering from first visible pipe
     if (-game_x + pipe_x > horizontal_pipe_gap) {
@@ -295,8 +280,12 @@ let draw = _ => {
         random();
     }
 
+    console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap, 0)));
+
+    /*
     if (calc_col(0, dynamic_floor_start * 3, width, 1))
         console.log("floor!");
+    */
 
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
@@ -339,7 +328,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
 
     //calc_col(...arguments)
     // Main body
-    calc_col(...arguments) ? fill(...pipe_color) : fill(255, 0, 0);
+    collide && calc_col(...arguments) ? fill(...pipe_color) : fill(255, 0, 0);
     shade_pipe(x, width);
 
     // Highlights
