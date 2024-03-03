@@ -272,8 +272,11 @@ let draw = _ => {
 
     // Draw the pipes
     temp = seed;
-    for (i = game_x - pipe_x; i < width; i += horizontal_pipe_gap) // Iterates over x
+    for (i = game_x - pipe_x; i < width; i += horizontal_pipe_gap) {// Iterates over x
+        console.log(i);
         pipe_pair(i, height * (0.1 + random() * 0.4), math.abs(i - (width / 2 - player_width) + spout_width / 2) - player_width < pipe_width / 2);
+    }
+    console.log("E");
     seed = temp;
     // Start rendering from first visible pipe
     if (-game_x + pipe_x > horizontal_pipe_gap) {
