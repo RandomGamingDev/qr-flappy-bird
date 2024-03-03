@@ -1,7 +1,8 @@
+let d = document;
 let get_2d_context = canvas => canvas.getContext("2d");
 
 // Main Canvas
-let c = document.createElement("canvas");
+let c = d.createElement("canvas");
 let ctx = get_2d_context(c);
 
 // Pixelated Background Canvas
@@ -280,7 +281,7 @@ let draw = _ => {
         random();
     }
 
-    console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap, 0)));
+    //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap, 0)));
 
     /*
     if (calc_col(0, dynamic_floor_start * 3, width, 1))
@@ -359,18 +360,6 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
         fill(85, 128, 34);
         sides.forEach(shadow_y => fillRect(x, shadow_y, width, 3));
 
-        for (v of [
-            pipe_highlight_color,
-            [3, 69],
-            pipe_bright_highlight_color,
-            [6, 42],
-            [51, 3],
-            pipe_color,
-            [72, 3],
-        ]) v.length == 3 ? fill(...v) : fillRect(x + v[0], outer_side, v[1], 3);
-        //*/
-
-        /*
         // Highlight
         fill(...pipe_highlight_color); // spout_x
         fillRect(x + 3, outer_side, 69, 3);
@@ -383,7 +372,6 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
         // Body color
         fill(...pipe_color);
         fillRect(x + 72, outer_side, 3, 3);
-        //*/
     }
 
     // Outside stroke
@@ -393,5 +381,5 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
 
 // The initialization stuff's at the end so everything can be one let and for clarity
 d.body.style = "margin:0";
-c.style = "display:block"
+c.style = "display:block";
 d.body.appendChild(c);
