@@ -63,12 +63,6 @@ let general_stroke = (context, ...args) => {
 let stroke = (...args) => general_stroke(ctx, ...args);
 let background_stroke = (...args) => general_stroke(background_ctx, ...args);
 
-let oval = (...args) => {
-    //ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
-    beginPath();
-    ctx.ellipse(...args, 0, full_rot);
-}
-
 let fillRect = (...args) => ctx.fillRect(...args);
 
 let background_rect = (...args) => background_ctx.rect(...args);
@@ -236,7 +230,7 @@ let pipe_pair = (x, y, collide) => {
 }
 
 let points = 0;
-let game_x = 0;//width * 0.75;
+let game_x = width * 0.75;
 let pipe_x = 0;
 let start;
 let deltaTime;
@@ -248,11 +242,13 @@ let player_width = 25;
 let player_height = 20;
 let horizontal_pipe_gap = 200;
 let player_rot;
+let hit_floor;
 
 // Draw
 let draw = _ => {
     deltaTime = new Date() - start ? start : 0;
     start = new Date();
+    hit_floor = calc_col(0, dynamic_floor_start * 3, width, 1);
 
     // Background
     ctx.imageSmoothingEnabled = false;
@@ -283,8 +279,11 @@ let draw = _ => {
 
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
-    oval(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
-    fill(255, 0, 0);
+    beginPath();
+    ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
+    //ctx.lineWidth = 6;
+    stroke(edge_color);
+    fill(212, 191, 39);
     beginPath();
     // Apply gravity
     player_vel_y += 0.5;
@@ -293,11 +292,11 @@ let draw = _ => {
     player_y += player_vel_y;
 
     // game_x -= 2;
-    game_x -= height * 0.002;
+    game_x -= 400 / height;
 
     console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
 
-    if (!calc_col(0, dynamic_floor_start * 3, width, 1))
+    if (!hit_floor)
         requestAnimationFrame(draw);
 }
 let jump = _ => player_vel_y = -9;
@@ -323,8 +322,10 @@ draw();
 function pipe_rect(x, y, width, height, collide, spout, flip) {
     shade_pipe = (x, w) => fillRect(x, y, w, height);
 
-    if (collide && calc_col(...arguments))
+    if (collide && calc_col(...arguments)) {
+        player_vel_y = player_terminal_vel_y;
         jump = _ => {};
+    }
 
     // Main body
     fill(...pipe_color);
@@ -359,7 +360,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
         sides.forEach(shadow_y => fillRect(x, shadow_y, width, 3));
 
         // Highlight
-        fill(...pipe_highlight_color); // spout_x
+        fill(...pipe_highlight_color);
         fillRect(x + 3, outer_side, 69, 3);
 
         // Bright highlight
