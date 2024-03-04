@@ -93,7 +93,7 @@ let new_point
 let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
     
-    for (i = 0; i < full_rot; i += 0.1) {
+    for (let i = 0; i < full_rot; i += 0.1) {
         prerot_point = [player_width * cos(i), player_height * sin(i)];
         dist_from_origin = math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
         new_rot = math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
@@ -272,24 +272,14 @@ let draw = _ => {
 
     // Draw the pipes
     temp = seed;
-    for (i = game_x - pipe_x; i < width; i += horizontal_pipe_gap) {// Iterates over x
-        console.log(i);
+    for (i = game_x - pipe_x; i < width; i += horizontal_pipe_gap) // Iterates over x
         pipe_pair(i, height * (0.1 + random() * 0.4), math.abs(i - (width / 2 - player_width) + spout_width / 2) - player_width < pipe_width / 2);
-    }
-    console.log("E");
     seed = temp;
     // Start rendering from first visible pipe
     if (-game_x + pipe_x > horizontal_pipe_gap) {
         pipe_x -= horizontal_pipe_gap;
         random();
     }
-
-    //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap, 0)));
-
-    /*
-    if (calc_col(0, dynamic_floor_start * 3, width, 1))
-        console.log("floor!");
-    */
 
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
@@ -305,7 +295,10 @@ let draw = _ => {
     // game_x -= 2;
     game_x -= height * 0.002;
 
-    requestAnimationFrame(draw);
+    console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
+
+    if (!calc_col(0, dynamic_floor_start * 3, width, 1))
+        requestAnimationFrame(draw);
 }
 let jump = _ => player_vel_y = -9;
 
@@ -330,9 +323,11 @@ draw();
 function pipe_rect(x, y, width, height, collide, spout, flip) {
     shade_pipe = (x, w) => fillRect(x, y, w, height);
 
-    //calc_col(...arguments)
+    if (collide && calc_col(...arguments))
+        jump = _ => {};
+
     // Main body
-    collide && calc_col(...arguments) ? fill(...pipe_color) : fill(255, 0, 0);
+    fill(...pipe_color);
     shade_pipe(x, width);
 
     // Highlights
