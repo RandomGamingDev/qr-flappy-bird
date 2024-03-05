@@ -45,23 +45,25 @@ let background_bar = (color, y, height) => {
 let floor = math.floor;
 let cos = math.cos;
 let sin = math.sin;
-let random = _ => (seed = math.sin(seed) * 10000) - floor(seed);
+let random = _ => (seed = sin(seed) * 10000) - floor(seed);
 
-let general_fill = (context, ...args) => {
-    context.fillStyle = rgb(args);
-    context.fill();
+let fill = (...args) => {
+    ctx.fillStyle = rgb(args);
+    ctx.fill();
+}
+let background_fill = (...args) => {
+    background_ctx.fillStyle = rgb(args);
+    background_fill();
 }
 
-let fill = (...args) => general_fill(ctx, ...args);
-let background_fill = (...args) => general_fill(background_ctx, ...args);
-
-let general_stroke = (context, ...args) => {
-    context.strokeStyle = rgb(args);
-    context.stroke();
-}
-
-let stroke = (...args) => general_stroke(ctx, ...args);
-let background_stroke = (...args) => general_stroke(background_ctx, ...args);
+let stroke = (...args) => {
+    ctx.strokeStyle = rgb(args);
+    ctx.stroke()
+};
+let background_stroke = (...args) => {
+    background_ctx.strokeStyle = rgb(args);
+    background_ctx.stroke();
+};
 
 let fillRect = (...args) => ctx.fillRect(...args);
 
@@ -71,10 +73,8 @@ let background_fillRect = (...args) => background_ctx.fillRect(...args);
 
 let background_strokeRect = (...args) => background_ctx.strokeRect(...args);
 
-let general_beginPath = (context, ...args) => context.beginPath(...args);
-
-let beginPath = _ => general_beginPath(ctx);
-let background_beginPath = _ => general_beginPath(background_ctx);
+let beginPath = _ => ctx.beginPath(ctx);
+let background_beginPath = _ => background_ctx.beginPath(background_ctx);
 
 let add_event_listener = addEventListener;
 
@@ -135,9 +135,11 @@ let resize = _ => {
 
     // Remove the clouds' aliasing effects
     for (i = 0; i < background_width; i++) // Iterates over x
-        for (j = cloud_base - cloud_radius; j < cloud_base; j++) // Iterates over y
-            if (![to_string(sky_fill), to_string(cloud_fill)].includes(to_string(background_ctx.getImageData(i, j, 1, 1).data)))
+        for (j = cloud_base - cloud_radius; j < cloud_base; j++) { // Iterates over y
+            temp = to_string(background_ctx.getImageData(i, j, 1, 1).data);
+            if (temp != to_string(sky_fill) && temp != to_string(cloud_fill))
                 background_ctx.putImageData(new ImageData(new Uint8ClampedArray(cloud_fill), 1, 1), i, j);
+        }
 
     dynamic_floor_start = floor(background_height * 0.875);
     dynamic_dirt_start = floor(background_height * 0.895);
@@ -258,7 +260,6 @@ let draw = _ => {
     background_fill(115, 191, 46);
     background_fillRect(0, dynamic_floor_start + 2, background_width, dynamic_dirt_start - dynamic_floor_start);
 
-    //background_fill(255, 0, 0);
     // 156 230 89 (Grass stripe)
 
     // Draw the pipes
@@ -278,7 +279,7 @@ let draw = _ => {
     }
 
     // Draw the player
-    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
+    //player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
     beginPath();
     ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
     //ctx.lineWidth = 6;
@@ -292,9 +293,12 @@ let draw = _ => {
     player_y += player_vel_y;
 
     // game_x -= 2;
-    game_x -= 400 / height;
+    game_x -= 800 / height;
 
-    console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
+    fill(255, 0, 0);
+    //ctx.font = "48px";
+    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0)), width / 2, 75);
+    //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
 
     if (!hit_floor)
         requestAnimationFrame(draw);
