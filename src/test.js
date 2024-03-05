@@ -53,7 +53,7 @@ let fill = (...args) => {
 }
 let background_fill = (...args) => {
     background_ctx.fillStyle = rgb(args);
-    background_fill();
+    background_ctx.fill();
 }
 
 let stroke = (...args) => {
@@ -279,7 +279,7 @@ let draw = _ => {
     }
 
     // Draw the player
-    //player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
+    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
     beginPath();
     ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
     //ctx.lineWidth = 6;
@@ -296,8 +296,8 @@ let draw = _ => {
     game_x -= 800 / height;
 
     fill(255, 0, 0);
-    //ctx.font = "48px";
-    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0)), width / 2, 75);
+    //ctx.font = "36px Impact";
+    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0)), width / 2, 65);
     //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
 
     if (!hit_floor)
