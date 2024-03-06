@@ -19,6 +19,7 @@ let i;
 let j;
 let temp;
 let seed = math.random();
+let two_fifty_five = 255;
 let width;
 let height;
 let background_width;
@@ -100,8 +101,8 @@ let calc_col = (rx, ry, rw, rh) => {
 } 
 
 // Events (there's something that went wrong here)
-let sky_fill = [112, 197, 205, 255];
-let cloud_fill = [234, 253, 219, 255];
+let sky_fill = [112, 197, 205, two_fifty_five];
+let cloud_fill = [234, 253, 219, two_fifty_five];
 let cloud_radius = 16;
 let cloud_base;
 let bush_base;
@@ -191,8 +192,8 @@ let resize = _ => {
     for (i = 0; i < background_width; i += 2)
         for (j = 0; j < background_height; j += 3)
             for (temp = 0; temp < 2; temp++)
-                if (to_string(background_ctx.getImageData(i, j + temp, 1, 1).data) == "216,243,204,255")
-                    background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, 255]), 1, 1), i, j + temp);
+                if (to_string(background_ctx.getImageData(i, j + temp, 1, 1).data) == "216,243,204,two_fifty_five")
+                    background_ctx.putImageData(new ImageData(new Uint8ClampedArray([193, 232, 192, two_fifty_five]), 1, 1), i, j + temp);
     //*/
 
     // Bushes
@@ -295,7 +296,7 @@ let draw = _ => {
     // game_x -= 2;
     game_x -= 800 / height;
 
-    fill(255, 0, 0);
+    fill(two_fifty_five, two_fifty_five, two_fifty_five);
     //ctx.font = "36px Impact";
     ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0)), width / 2, 65);
     //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
