@@ -235,8 +235,6 @@ let pipe_pair = (x, y, collide) => {
 let points = 0;
 let game_x = width * 0.75;
 let pipe_x = 0;
-let start;
-let deltaTime;
 let player_y = height / 2;
 let calc_player_x = _ => width / 2 - player_width;
 let player_vel_y = 0;
@@ -249,8 +247,6 @@ let hit_floor;
 
 // Draw
 let draw = _ => {
-    deltaTime = new Date() - start ? start : 0;
-    start = new Date();
     hit_floor = calc_col(0, dynamic_floor_start * 3, width, 1);
 
     // Background
@@ -283,7 +279,7 @@ let draw = _ => {
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
     beginPath();
     ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
-    //ctx.lineWidth = 6;
+    ctx.lineWidth = 6;
     stroke(edge_color);
     fill(212, 191, 39);
     beginPath();
@@ -293,12 +289,12 @@ let draw = _ => {
         player_vel_y = player_terminal_vel_y;
     player_y += player_vel_y;
 
-    // game_x -= 2;
-    game_x -= 800 / height;
+    game_x -= 2;
+    // game_x -= 800 / height;
 
     fill(two_fifty_five, two_fifty_five, two_fifty_five);
-    //ctx.font = "36px Impact";
-    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0)), width / 2, 65);
+    ctx.font = "36px Impact";
+    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap) + 1, 0)), width / 2, 65);
     //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
 
     if (!hit_floor)
