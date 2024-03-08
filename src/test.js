@@ -79,8 +79,6 @@ let fillRect = (...args) => ctx.fillRect(...args);
 
 let background_fillRect = (...args) => background_ctx.fillRect(...args);
 
-let background_strokeRect = (...args) => background_ctx.strokeRect(...args);
-
 let beginPath = _ => ctx.beginPath(ctx);
 let background_beginPath = _ => background_ctx.beginPath(background_ctx);
 
@@ -284,6 +282,7 @@ let draw = _ => {
     ctx.lineWidth = 6;
     stroke(ctx, edge_color);
     fill(212, 191, 39);
+
     beginPath();
     // Apply gravity
     player_vel_y += 0.5;
@@ -372,7 +371,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     }
 
     // Outside stroke
-    stroke(ctx, ...edge_color);
+    stroke(ctx, ...edge_color); // remove later?
     ctx.strokeRect(...arguments)
 }
 
