@@ -13,23 +13,36 @@ let background_ctx = get_2d_context(background_canvas);
 let math = Math;
 let pi = math.PI;
 let full_rot = 2 * pi;
+let seed = math.random();
+let two_fifty_five = 255;
+let pipe_width = 74;
+let pipe_gap = 157;
+let spout_width = 80;
+let spout_height = 37;
+
+// Empty variables
 let dynamic_floor_start;
 let dynamic_dirt_start;
 let i;
 let j;
 let temp;
-let seed = math.random();
-let two_fifty_five = 255;
 let width;
 let height;
 let background_width;
 let background_height;
-let pipe_width = 74;
-// Pipe parameters
-let pipe_gap = 157;
-// Pipe parameters
-let spout_width = 80;
-let spout_height = 37;
+let player_x;
+let prerot_point;
+let dist_from_origin;
+let new_rot;
+let new_point;
+let cloud_base;
+let bush_base;
+let player_rot;
+let hit_floor;
+let shade_pipe;
+let pipe_right_x;
+let sides;
+let outer_side;
 
 // Colors
 let edge_color = [84, 56, 71];
@@ -57,18 +70,12 @@ let background_fill = (...args) => {
     background_ctx.fill();
 }
 
-let stroke = (...args) => {
-    ctx.strokeStyle = rgb(args);
-    ctx.stroke()
-};
-let background_stroke = (...args) => {
-    background_ctx.strokeStyle = rgb(args);
-    background_ctx.stroke();
+let stroke = (context, ...args) => {
+    context.strokeStyle = rgb(args);
+    context.stroke()
 };
 
 let fillRect = (...args) => ctx.fillRect(...args);
-
-let background_rect = (...args) => background_ctx.rect(...args);
 
 let background_fillRect = (...args) => background_ctx.fillRect(...args);
 
@@ -80,16 +87,11 @@ let background_beginPath = _ => background_ctx.beginPath(background_ctx);
 let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
-let player_x;
-let prerot_point;
-let dist_from_origin;
-let new_rot;
-let new_point
 let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
     
-    for (let i = 0; i < full_rot; i += 0.1) {
-        prerot_point = [player_width * cos(i), player_height * sin(i)];
+    for (j = 0; j < full_rot; j += 0.1) {
+        prerot_point = [player_width * cos(j), player_height * sin(j)];
         dist_from_origin = math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
         new_rot = math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
         new_point = [player_x + dist_from_origin * cos(new_rot), player_y + dist_from_origin * sin(new_rot)]
@@ -104,8 +106,6 @@ let calc_col = (rx, ry, rw, rh) => {
 let sky_fill = [112, 197, 205, two_fifty_five];
 let cloud_fill = [234, 253, 219, two_fifty_five];
 let cloud_radius = 16;
-let cloud_base;
-let bush_base;
 let bush_fill = [130, 228, 140];
 let bush_radius = 8;
 let resize = _ => {
@@ -180,8 +180,8 @@ let resize = _ => {
                 ]
             ) {
             background_beginPath();
-            background_rect(i - j[0], bush_base - j[1], j[2], j[1]);
-            background_stroke(161, 214, 215);
+            background_ctx.rect(i - j[0], bush_base - j[1], j[2], j[1]);
+            stroke(background_ctx, 161, 214, 215);
             background_fill(216, 243, 204);
         }
 
@@ -207,7 +207,7 @@ let resize = _ => {
         for (j = -random() * 28; j <= background_width; j += 28) { // Iterates over x
             background_beginPath(); // Without begin and end path everything turns green
             background_ctx.arc(j, bush_base + 2 * i, bush_radius, 0, pi, true);
-            background_stroke(109, 202, 135);
+            stroke(background_ctx, 109, 202, 135);
             background_fill(...bush_fill);
             background_beginPath();
         }
@@ -242,11 +242,13 @@ let player_terminal_vel_y = 9;
 let player_width = 25;
 let player_height = 20;
 let horizontal_pipe_gap = 200;
-let player_rot;
-let hit_floor;
+let max_player_y = -10;
 
 // Draw
 let draw = _ => {
+    if (player_y < max_player_y)
+        player_y = max_player_y;
+
     hit_floor = calc_col(0, dynamic_floor_start * 3, width, 1);
 
     // Background
@@ -280,7 +282,7 @@ let draw = _ => {
     beginPath();
     ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
     ctx.lineWidth = 6;
-    stroke(edge_color);
+    stroke(ctx, edge_color);
     fill(212, 191, 39);
     beginPath();
     // Apply gravity
@@ -293,39 +295,34 @@ let draw = _ => {
     // game_x -= 800 / height;
 
     fill(two_fifty_five, two_fifty_five, two_fifty_five);
-    ctx.font = "36px Impact";
-    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap) + 1, 0)), width / 2, 65);
-    //console.log(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap), 0));
+    ctx.font = "48px Impact";
+    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap) + 1, 0)), width / 2, 85);
 
     if (!hit_floor)
         requestAnimationFrame(draw);
 }
 let jump = _ => player_vel_y = -9;
 
-let shade_pipe;
-let pipe_right_x;
-let sides;
-let outer_side;
 let pipe_color = [115, 191, 46];
 let pipe_highlight_color = [155, 227, 89];
 let pipe_bright_highlight_color = [228, 253, 139];
 let pipe_shadow = [85, 128, 34];
 
-add_event_listener("keydown", (event) => {
+add_event_listener("keydown", event => {
     if (event.key == " ")
         jump();
 });
-add_event_listener("mousedown", jump);
+add_event_listener("mousedown", _ => jump());
 add_event_listener("resize", resize);
 draw();
 
 // The function's at the end so that everything can be in 1 let
 function pipe_rect(x, y, width, height, collide, spout, flip) {
-    shade_pipe = (x, w) => fillRect(x, y, w, height);
+    shade_pipe = (x, w = 3) => fillRect(x, y, w, height);
 
     if (collide && calc_col(...arguments)) {
         player_vel_y = player_terminal_vel_y;
-        jump = _ => {};
+        jump = _ => 0;
     }
 
     // Main body
@@ -337,7 +334,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     // Left highlight
     shade_pipe(x, 18);
     // Middle Left highlight strand
-    shade_pipe(x + 21, 3);
+    shade_pipe(x + 21);
 
     // Leftmost bright highlight
     fill(...pipe_bright_highlight_color);
@@ -349,7 +346,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     // Shadows
     fill(...pipe_shadow);
     // Right Middle shadow strand
-    shade_pipe(pipe_right_x - 14, 3);
+    shade_pipe(pipe_right_x - 14);
     // Right shadow
     shade_pipe(pipe_right_x - 8, 6);
 
@@ -375,7 +372,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     }
 
     // Outside stroke
-    stroke(...edge_color);
+    stroke(ctx, ...edge_color);
     ctx.strokeRect(...arguments)
 }
 
