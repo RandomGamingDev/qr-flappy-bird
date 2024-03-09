@@ -57,9 +57,7 @@ let background_bar = (color, y, height) => {
 }
 
 let floor = math.floor;
-let cos = math.cos;
-let sin = math.sin;
-let random = _ => (seed = sin(seed) * 10000) - floor(seed);
+let random = _ => (seed = math.sin(seed) * 10000) - floor(seed);
 
 let fill = (...args) => {
     ctx.fillStyle = rgb(args);
@@ -69,6 +67,7 @@ let background_fill = (...args) => {
     background_ctx.fillStyle = rgb(args);
     background_ctx.fill();
 }
+let fill_arr = arr => fill(...arr);
 
 let stroke = (context, ...args) => {
     context.strokeStyle = rgb(args);
@@ -82,6 +81,13 @@ let background_fillRect = (...args) => background_ctx.fillRect(...args);
 let beginPath = _ => ctx.beginPath(ctx);
 let background_beginPath = _ => background_ctx.beginPath(background_ctx);
 
+let ellipse = (fill_color, ...args) => {
+    beginPath();
+    ctx.ellipse(...args, 0, 0, full_rot);
+    stroke(ctx, edge_color);
+    fill(...fill_color);
+}
+
 let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
@@ -89,12 +95,12 @@ let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
  
     for (j = 0; j < full_rot; j += 0.1) {
-        prerot_point_x = player_width * cos(j);
-        prerot_point_y = player_height * sin(j);
+        prerot_point_x = player_width * math.cos(j);
+        prerot_point_y = player_height * math.sin(j);
         dist_from_origin = math.sqrt(prerot_point_x * prerot_point_x + prerot_point_y * prerot_point_y);
         new_rot = math.atan2(prerot_point_y, prerot_point_x) + player_rot;
-        new_point_x = player_x + dist_from_origin * cos(new_rot);
-        new_point_y = player_y + dist_from_origin * sin(new_rot);
+        new_point_x = player_x + dist_from_origin * math.cos(new_rot);
+        new_point_y = player_y + dist_from_origin * math.sin(new_rot);
 
         if (new_point_x > rx && new_point_x < rx + rw && new_point_y > ry && new_point_y < ry + rh)
           return true;
@@ -283,6 +289,7 @@ let draw = _ => {
     ctx.rotate(player_rot);
 
     // Draw the main body
+    /*
     beginPath();
     ctx.ellipse(0, 0, player_width, player_height, 0, 0, full_rot);
     stroke(ctx, edge_color);
@@ -292,6 +299,21 @@ let draw = _ => {
     ctx.ellipse(11, -7, 9, 9, 0, 0, full_rot);
     stroke(ctx, edge_color);
     fill(255, 255, 255);
+
+    beginPath();
+    ctx.ellipse(13, -7, 3, 6, 0, 0, full_rot);
+    fill_arr(edge_color);
+
+    /*
+    beginPath();
+    ctx.ellipse(13, -7, 3, 6, 0, 0, full_rot);
+    stroke(ctx, edge_color);
+    fill(234, 80, 64);
+    */
+
+   ellipse([212, 191, 39], 0, 0, player_width, player_height);
+   ellipse([255, 255, 255], 11, -7, 9, 9);
+   ellipse(edge_color, 13, -7, 1, 4);
 
     ctx.restore();
 
@@ -338,25 +360,25 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     }
 
     // Main body
-    fill(...pipe_color);
+    fill_arr(pipe_color);
     shade_pipe(x, width);
 
     // Highlights
-    fill(...pipe_highlight_color);
+    fill_arr(pipe_highlight_color);
     // Left highlight
     shade_pipe(x, 18);
     // Middle Left highlight strand
     shade_pipe(x + 21);
 
     // Leftmost bright highlight
-    fill(...pipe_bright_highlight_color);
+    fill_arr(pipe_bright_highlight_color);
     fillRect(x + 3, y, 3, height);
 
     // Scale by left
     pipe_right_x = x + width;
 
     // Shadows
-    fill(...pipe_shadow);
+    fill_arr(pipe_shadow);
     // Right Middle shadow strand
     shade_pipe(pipe_right_x - 14);
     // Right shadow
@@ -371,16 +393,16 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
         fillRect(x, j, width, 3);
 
         // Highlight
-        fill(...pipe_highlight_color);
+        fill_arr(pipe_highlight_color);
         fillRect(x + 3, outer_side, 69, 3);
 
         // Bright highlight
-        fill(...pipe_bright_highlight_color);
+        fill_arr(pipe_bright_highlight_color);
         fillRect(x + 6, outer_side, 42, 3);
         fillRect(x + 51, outer_side, 3, 3);
 
         // Body color
-        fill(...pipe_color);
+        fill_arr(pipe_color);
         fillRect(x + 72, outer_side, 3, 3);
     }
 
