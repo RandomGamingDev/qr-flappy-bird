@@ -85,7 +85,7 @@ let ellipse = (fill_color, ...args) => {
     beginPath();
     ctx.ellipse(...args, 0, 0, full_rot);
     stroke(ctx, edge_color);
-    fill(...fill_color);
+    fill_arr(fill_color);
 }
 
 let add_event_listener = addEventListener;
