@@ -37,8 +37,13 @@ let player_rot;
 let hit_floor;
 let shade_pipe;
 let pipe_right_x;
-let sides;
 let outer_side;
+let prerot_point_x;
+let prerot_point_y;
+let dist_from_origin;
+let new_rot;
+let new_point_x;
+let new_point_y;
 
 // Colors
 let edge_color = [84, 56, 71];
@@ -68,7 +73,7 @@ let background_fill = (...args) => {
 let stroke = (context, ...args) => {
     context.strokeStyle = rgb(args);
     context.stroke()
-};
+}
 
 let fillRect = (...args) => ctx.fillRect(...args);
 
@@ -80,18 +85,6 @@ let background_beginPath = _ => background_ctx.beginPath(background_ctx);
 let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
-/*
-let prerot_point;
-let dist_from_origin;
-let new_rot;
-let new_point;
-*/
-let prerot_point_x;
-let prerot_point_y;
-let dist_from_origin;
-let new_rot;
-let new_point_x;
-let new_point_y;
 let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
  
@@ -120,8 +113,8 @@ let resize = _ => {
     width = c.width = innerWidth;
     height = c.height = innerHeight;
     // For the background canvas
-    background_width = background_canvas.width = floor(width / 3);
-    background_height = background_canvas.height = floor(height / 3);
+    background_width = background_canvas.width = width / 3;
+    background_height = background_canvas.height = height / 3;
 
     // Render the background
     // Background's background
@@ -133,10 +126,11 @@ let resize = _ => {
     // Set the seed for generating the clouds
     temp = seed;
     seed = 5;
-    background_beginPath(); // Without begin and end path everything turns green
-    for (i = 0; i <= background_width; i += cloud_radius) // Iterates over x
+    for (i = 0; i <= background_width; i += cloud_radius) { // Iterates over x
+        background_beginPath(); // Without begin and end path everything turns green
         background_ctx.arc(i, cloud_base + random() * cloud_radius, cloud_radius, 0, full_rot);
-    background_fill(...cloud_fill);
+        background_fill(...cloud_fill);
+    }
     background_beginPath();
     seed = temp;
 
@@ -213,13 +207,13 @@ let resize = _ => {
             background_ctx.arc(j, bush_base + 2 * i, bush_radius, 0, pi, true);
             stroke(background_ctx, 109, 202, 135);
             background_fill(...bush_fill);
-            background_beginPath();
         }
     }
+    background_beginPath();
     seed = temp;
 
     beginPath();
-};
+}
 
 // Functions
 let spout_x = resize(); // Call resize here to avoid an extra let since it returns undefined anyways
@@ -284,10 +278,22 @@ let draw = _ => {
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
     ctx.lineWidth = 6;
+    ctx.save();
+    ctx.translate(calc_player_x(), player_y);
+    ctx.rotate(player_rot);
+
+    // Draw the main body
     beginPath();
-    ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
+    ctx.ellipse(0, 0, player_width, player_height, 0, 0, full_rot);
     stroke(ctx, edge_color);
     fill(212, 191, 39);
+
+    beginPath();
+    ctx.ellipse(11, -7, 9, 9, 0, 0, full_rot);
+    stroke(ctx, edge_color);
+    fill(255, 255, 255);
+
+    ctx.restore();
 
     beginPath();
     // Apply gravity
@@ -357,11 +363,12 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     shade_pipe(pipe_right_x - 8, 6);
 
     if (spout) {
-        sides = [y, y + height - 4]
-        outer_side = flip ? sides[0] : sides[1];
         // Dark
+        j = y + height - 4;
+        outer_side = flip ? y : j;
         fill(85, 128, 34);
-        sides.forEach(shadow_y => fillRect(x, shadow_y, width, 3));
+        fillRect(x, y, width, 3);
+        fillRect(x, j, width, 3);
 
         // Highlight
         fill(...pipe_highlight_color);
