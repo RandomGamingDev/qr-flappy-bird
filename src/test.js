@@ -133,12 +133,10 @@ let resize = _ => {
     seed = temp;
 
     // Remove the clouds' aliasing effects
-    for (i = 0; i < background_width; i++) // Iterates over x
-        for (j = cloud_base - cloud_radius; j < cloud_base; j++) { // Iterates over y
-            temp = to_string(background_ctx.getImageData(i, j, 1, 1).data);
-            if (temp != to_string(sky_fill) && temp != to_string(cloud_fill))
-                background_ctx.putImageData(new ImageData(new Uint8ClampedArray(cloud_fill), 1, 1), i, j);
-        }
+    temp = background_ctx.getImageData(0, 0, background_width, background_height);
+    temp.data.map((component, index) => sky_fill[index %= 4] != component && cloud_fill[index] != component ? cloud_fill[index] : component);
+
+    background_ctx.putImageData(temp, 0, 0);
 
     dynamic_floor_start = floor(background_height * 0.875);
     dynamic_dirt_start = floor(background_height * 0.895);
