@@ -277,9 +277,9 @@ let draw = _ => {
 
     // Draw the player
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
+    ctx.lineWidth = 6;
     beginPath();
     ctx.ellipse(calc_player_x(), player_y, player_width, player_height, player_rot, 0, full_rot);
-    ctx.lineWidth = 6;
     stroke(ctx, edge_color);
     fill(212, 191, 39);
 
