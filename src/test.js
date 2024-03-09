@@ -31,10 +31,6 @@ let height;
 let background_width;
 let background_height;
 let player_x;
-let prerot_point;
-let dist_from_origin;
-let new_rot;
-let new_point;
 let cloud_base;
 let bush_base;
 let player_rot;
@@ -48,7 +44,6 @@ let outer_side;
 let edge_color = [84, 56, 71];
 
 // Lambdas
-let to_string = String;
 let rgb = a => `rgb(${ a })`;
 
 let background_bar = (color, y, height) => {
@@ -85,24 +80,37 @@ let background_beginPath = _ => background_ctx.beginPath(background_ctx);
 let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
+/*
+let prerot_point;
+let dist_from_origin;
+let new_rot;
+let new_point;
+*/
+let prerot_point_x;
+let prerot_point_y;
+let dist_from_origin;
+let new_rot;
+let new_point_x;
+let new_point_y;
 let calc_col = (rx, ry, rw, rh) => {
     player_x = calc_player_x();
-    
+ 
     for (j = 0; j < full_rot; j += 0.1) {
-        prerot_point = [player_width * cos(j), player_height * sin(j)];
-        dist_from_origin = math.sqrt(prerot_point[0] ** 2 + prerot_point[1] ** 2);
-        new_rot = math.atan2(prerot_point[1], prerot_point[0]) + player_rot;
-        new_point = [player_x + dist_from_origin * cos(new_rot), player_y + dist_from_origin * sin(new_rot)]
+        prerot_point_x = player_width * cos(j);
+        prerot_point_y = player_height * sin(j);
+        dist_from_origin = math.sqrt(prerot_point_x * prerot_point_x + prerot_point_y * prerot_point_y);
+        new_rot = math.atan2(prerot_point_y, prerot_point_x) + player_rot;
+        new_point_x = player_x + dist_from_origin * cos(new_rot);
+        new_point_y = player_y + dist_from_origin * sin(new_rot);
 
-        if (new_point[0] > rx && new_point[0] < rx + rw && new_point[1] > ry && new_point[1] < ry + rh)
+        if (new_point_x > rx && new_point_x < rx + rw && new_point_y > ry && new_point_y < ry + rh)
           return true;
     }
-    return false;
 } 
 
 // Events (there's something that went wrong here)
-let sky_fill = [112, 197, 205, two_fifty_five];
-let cloud_fill = [234, 253, 219, two_fifty_five];
+let sky_fill = [112, 197, 205];
+let cloud_fill = [234, 253, 219];
 let cloud_radius = 16;
 let bush_fill = [130, 228, 140];
 let bush_radius = 8;
@@ -134,8 +142,8 @@ let resize = _ => {
 
     // Remove the clouds' aliasing effects
     temp = background_ctx.getImageData(0, 0, background_width, background_height);
+    // Don't worry about the array only being 3 long it'll return undefined which'll just result in it keeping its value
     temp.data.map((component, index) => sky_fill[index %= 4] != component && cloud_fill[index] != component ? cloud_fill[index] : component);
-
     background_ctx.putImageData(temp, 0, 0);
 
     dynamic_floor_start = floor(background_height * 0.875);
@@ -293,7 +301,8 @@ let draw = _ => {
 
     fill(two_fifty_five, two_fifty_five, two_fifty_five);
     ctx.font = "48px Impact";
-    ctx.fillText(to_string(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap) + 1, 0)), width / 2, 85);
+    // It automatically converts it to a string so it's fine
+    ctx.fillText(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap) + 1, 0), width / 2, 85);
 
     if (!hit_floor)
         requestAnimationFrame(draw);
