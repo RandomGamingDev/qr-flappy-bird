@@ -5,3 +5,5 @@
 This is the actual game :D
 
 You can try it out at https://randomgamingdev.github.io/qr-flappy-bird/ and the HTML file, QR code, as well as `data:text/html,` based code designed to run anywhere are available under the [`build`](https://github.com/RandomGamingDev/qr-flappy-bird/tree/main/build) directory
+
+This library uses https://github.com/RandomGamingDev/qr-cartridge to compile its code so make sure to have that installed. `build.sh` is how I personally call the compiler, but you can change it for whatever your needs are.
