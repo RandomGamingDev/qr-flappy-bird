@@ -212,6 +212,7 @@ let resize = _ => {
             background_fill(...bush_fill);
         }
     }
+    background_beginPath();
     seed = temp;
 
     player_x = width / 2 - player_width;
@@ -302,7 +303,7 @@ let draw = _ => {
     if (!game_over)
         game_x -= horizontal_pipe_gap * player_terminal_vel_y / (2 * 0.4 * height);
     fill(two_fifty_five, two_fifty_five, two_fifty_five);
-    ctx.font = "48px Impact";
+    ctx.font = "48px Sans";
     // It automatically converts it to a string so it's fine
     ctx.fillText(math.max(floor(-(game_x - player_x) / horizontal_pipe_gap) + 1, 0), width / 2, 85);
 
