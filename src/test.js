@@ -136,7 +136,6 @@ let resize = _ => {
         background_ctx.arc(i, cloud_base + random() * cloud_radius, cloud_radius, 0, full_rot);
         background_fill(...cloud_fill);
     }
-    background_beginPath();
     seed = temp;
 
     // Remove the clouds' aliasing effects
@@ -188,7 +187,6 @@ let resize = _ => {
             background_fill(216, 243, 204);
         }
 
-    background_beginPath();
 
     /*
     // Building Windows
@@ -214,10 +212,7 @@ let resize = _ => {
             background_fill(...bush_fill);
         }
     }
-    background_beginPath();
     seed = temp;
-
-    beginPath();
 
     player_x = width / 2 - player_width;
 }
@@ -387,7 +382,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     }
 
     // Outside stroke
-    stroke(ctx, ...edge_color); // remove later?
+    stroke(ctx, ...edge_color);
     ctx.strokeRect(...arguments)
 }
 
