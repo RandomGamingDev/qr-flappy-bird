@@ -247,6 +247,8 @@ let player_width = 25;
 let player_height = 20;
 let horizontal_pipe_gap = 200;
 let max_player_y = -10;
+let beak_color = [234, 80, 64];
+let white = [two_fifty_five, two_fifty_five, two_fifty_five];
 
 // Draw
 let draw = _ => {
@@ -289,31 +291,12 @@ let draw = _ => {
     ctx.rotate(player_rot);
 
     // Draw the main body
-    /*
-    beginPath();
-    ctx.ellipse(0, 0, player_width, player_height, 0, 0, full_rot);
-    stroke(ctx, edge_color);
-    fill(212, 191, 39);
-
-    beginPath();
-    ctx.ellipse(11, -7, 9, 9, 0, 0, full_rot);
-    stroke(ctx, edge_color);
-    fill(255, 255, 255);
-
-    beginPath();
-    ctx.ellipse(13, -7, 3, 6, 0, 0, full_rot);
-    fill_arr(edge_color);
-
-    /*
-    beginPath();
-    ctx.ellipse(13, -7, 3, 6, 0, 0, full_rot);
-    stroke(ctx, edge_color);
-    fill(234, 80, 64);
-    */
-
    ellipse([212, 191, 39], 0, 0, player_width, player_height);
-   ellipse([255, 255, 255], 11, -7, 9, 9);
+   ellipse(white, 11, -7, 9, 9);
    ellipse(edge_color, 13, -7, 1, 4);
+   ellipse(beak_color, 19, 7, 8, 2);
+   ellipse(beak_color, 18, 15, 7, 2);
+   ellipse(white, -15, -1, 11, 9);
 
     ctx.restore();
 
