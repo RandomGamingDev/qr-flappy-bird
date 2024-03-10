@@ -387,6 +387,6 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
 }
 
 // The initialization stuff's at the end so everything can be one let and for clarity
-d.body.style = "margin:0";
+d.body.style = "margin:0;touch-action:manipulation";
 c.style = "display:block";
 d.body.appendChild(c);
