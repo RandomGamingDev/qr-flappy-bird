@@ -19,6 +19,8 @@ let pipe_width = 74;
 let pipe_gap = 157;
 let spout_width = 80;
 let spout_height = 37;
+let player_width = 25;
+let player_height = 20;
 
 // Empty variables
 let dynamic_floor_start;
@@ -37,13 +39,13 @@ let player_rot;
 let hit_floor;
 let shade_pipe;
 let pipe_right_x;
-let outer_side;
 let prerot_point_x;
 let prerot_point_y;
 let dist_from_origin;
 let new_rot;
 let new_point_x;
 let new_point_y;
+let game_over;
 
 // Colors
 let edge_color = [84, 56, 71];
@@ -92,8 +94,6 @@ let add_event_listener = addEventListener;
 
 // Calculate whether between the and a pipe are touching
 let calc_col = (rx, ry, rw, rh) => {
-    player_x = calc_player_x();
- 
     for (j = 0; j < full_rot; j += 0.1) {
         prerot_point_x = player_width * math.cos(j);
         prerot_point_y = player_height * math.sin(j);
@@ -112,7 +112,6 @@ let sky_fill = [112, 197, 205];
 let cloud_fill = [234, 253, 219];
 let cloud_radius = 16;
 let bush_fill = [130, 228, 140];
-let bush_radius = 8;
 let resize = _ => {
     // Set the widths and heights
     // For the main canvas
@@ -132,7 +131,7 @@ let resize = _ => {
     // Set the seed for generating the clouds
     temp = seed;
     seed = 5;
-    for (i = 0; i <= background_width; i += cloud_radius) { // Iterates over x
+    for (i = 0; i < background_width; i += cloud_radius) { // Iterates over x
         background_beginPath(); // Without begin and end path everything turns green
         background_ctx.arc(i, cloud_base + random() * cloud_radius, cloud_radius, 0, full_rot);
         background_fill(...cloud_fill);
@@ -167,7 +166,7 @@ let resize = _ => {
     background_ctx.lineWidth = 2;
 
     // Buildings
-    for (i = 0; i <= background_width; i += 39)
+    for (i = 0; i < background_width; i += 39)
         for (j of 
                 // x, y & height, width
                 [
@@ -208,9 +207,9 @@ let resize = _ => {
     temp = seed;
     seed = 10;
     for (i = 0; i < 5; i++) { // Iterates over y
-        for (j = -random() * 28; j <= background_width; j += 28) { // Iterates over x
+        for (j = -random() * 28; j < background_width; j += 28) { // Iterates over x
             background_beginPath(); // Without begin and end path everything turns green
-            background_ctx.arc(j, bush_base + 2 * i, bush_radius, 0, pi, true);
+            background_ctx.arc(j, bush_base + 2 * i, 8, 0, pi, true);
             stroke(background_ctx, 109, 202, 135);
             background_fill(...bush_fill);
         }
@@ -219,6 +218,8 @@ let resize = _ => {
     seed = temp;
 
     beginPath();
+
+    player_x = width / 2 - player_width;
 }
 
 // Functions
@@ -236,15 +237,11 @@ let pipe_pair = (x, y, collide) => {
     pipe_rect(spout_x, y + pipe_gap, spout_width, spout_height, collide, 1, 1);
 }
 
-let points = 0;
 let game_x = width * 0.75;
 let pipe_x = 0;
 let player_y = height / 2;
-let calc_player_x = _ => width / 2 - player_width;
 let player_vel_y = 0;
 let player_terminal_vel_y = 9;
-let player_width = 25;
-let player_height = 20;
 let horizontal_pipe_gap = 200;
 let max_player_y = -10;
 let beak_color = [234, 80, 64];
@@ -287,7 +284,7 @@ let draw = _ => {
     player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
     ctx.lineWidth = 6;
     ctx.save();
-    ctx.translate(calc_player_x(), player_y);
+    ctx.translate(player_x, player_y);
     ctx.rotate(player_rot);
 
     // Draw the main body
@@ -307,8 +304,8 @@ let draw = _ => {
         player_vel_y = player_terminal_vel_y;
     player_y += player_vel_y;
 
-    game_x -= 2;
-    // game_x -= 800 / height;
+    if (!game_over)
+        game_x -= 2000 / height;
 
     fill(two_fifty_five, two_fifty_five, two_fifty_five);
     ctx.font = "48px Impact";
@@ -340,6 +337,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     if (collide && calc_col(...arguments)) {
         player_vel_y = player_terminal_vel_y;
         jump = _ => 0;
+        game_over = true;
     }
 
     // Main body
@@ -370,23 +368,23 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
     if (spout) {
         // Dark
         j = y + height - 4;
-        outer_side = flip ? y : j;
         fill(85, 128, 34);
         fillRect(x, y, width, 3);
         fillRect(x, j, width, 3);
+        j = flip ? y : j;
 
         // Highlight
         fill_arr(pipe_highlight_color);
-        fillRect(x + 3, outer_side, 69, 3);
+        fillRect(x + 3, j, 69, 3);
 
         // Bright highlight
         fill_arr(pipe_bright_highlight_color);
-        fillRect(x + 6, outer_side, 42, 3);
-        fillRect(x + 51, outer_side, 3, 3);
+        fillRect(x + 6, j, 42, 3);
+        fillRect(x + 51, j, 3, 3);
 
         // Body color
         fill_arr(pipe_color);
-        fillRect(x + 72, outer_side, 3, 3);
+        fillRect(x + 72, j, 3, 3);
     }
 
     // Outside stroke
