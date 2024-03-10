@@ -281,7 +281,7 @@ let draw = _ => {
     }
 
     // Draw the player
-    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > 0 ? pi / 2 : 0.4);
+    player_rot = player_vel_y / player_terminal_vel_y * (player_vel_y > -1 ? pi / 2 : 0.6);
     ctx.lineWidth = 6;
     ctx.save();
     ctx.translate(player_x, player_y);
@@ -305,8 +305,7 @@ let draw = _ => {
     player_y += player_vel_y;
 
     if (!game_over)
-        game_x -= 2000 / height;
-
+        game_x -= horizontal_pipe_gap * player_terminal_vel_y / (2 * 0.4 * height);
     fill(two_fifty_five, two_fifty_five, two_fifty_five);
     ctx.font = "48px Impact";
     // It automatically converts it to a string so it's fine
@@ -315,7 +314,7 @@ let draw = _ => {
     if (!hit_floor)
         requestAnimationFrame(draw);
 }
-let jump = _ => player_vel_y = -9;
+let jump = _ => player_vel_y = -player_terminal_vel_y;
 
 let pipe_color = [115, 191, 46];
 let pipe_highlight_color = [155, 227, 89];
