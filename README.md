@@ -11,4 +11,4 @@ This library uses https://github.com/RandomGamingDev/qr-cartridge to compile its
 <br/><br/><br/>
 
 <img width=512 height=512 src="https://raw.githubusercontent.com/RandomGamingDev/qr-flappy-bird/main/build/qrcode.svg"/> <br/>
-Here's the QR code which contains the code for the game. To play simply copy the text and paste it into the search bar of a compatible browser that accepts `data:text/html,` (aka try your browser, if for some reason it doesn't work try another). Something to note is that it's quite possible that it'll take a while to load from the URL since `data:text/html,` is like that for some reason, so if you see it loading wait until it loads.
+Here's the QR code which contains the code for the game. To play simply copy the text and paste it into the search bar of a compatible browser that accepts `data:text/html,` (aka try your browser (I recommend using Chrome since it worked for me), if for some reason it doesn't work try another). Something to note is that it's quite possible that it'll take a while to load from the URL since `data:text/html,` is like that for some reason, so if you see it loading wait until it loads.
