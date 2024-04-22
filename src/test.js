@@ -329,7 +329,9 @@ draw();
 function pipe_rect(x, y, width, height, collide, spout, flip) {
     shade_pipe = (x, w = 3) => fillRect(x, y, w, height);
 
-    if (collide && calc_col(...arguments)) {
+    temp = arguments;
+
+    if (collide && calc_col(...temp)) {
         player_vel_y = player_terminal_vel_y;
         jump = _ => 0;
         game_over = true;
@@ -384,7 +386,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
 
     // Outside stroke
     stroke(ctx, ...edge_color);
-    ctx.strokeRect(...arguments)
+    ctx.strokeRect(...temp)
 }
 
 // The initialization stuff's at the end so everything can be one let and for clarity
