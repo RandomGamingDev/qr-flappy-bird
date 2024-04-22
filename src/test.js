@@ -109,7 +109,7 @@ let calc_col = (rx, ry, rw, rh) => {
 
 // Events (there's something that went wrong here)
 let sky_fill = [112, 197, 205];
-let cloud_fill = [234, 253, 219];
+let cloud_fill = [234, 253, 219, 255];
 let cloud_radius = 16;
 let bush_fill = [130, 228, 140];
 let resize = _ => {
@@ -138,11 +138,8 @@ let resize = _ => {
     }
     seed = temp;
 
-    // Remove the clouds' aliasing effects
-    temp = background_ctx.getImageData(0, 0, background_width, background_height);
-    // Don't worry about the array only being 3 long it'll return undefined which'll just result in it keeping its value
-    temp.data.map((component, index) => sky_fill[index %= 4] != component && cloud_fill[index] != component ? cloud_fill[index] : component);
-    background_ctx.putImageData(temp, 0, 0);
+    // Remove some aliasing effects
+    background_ctx.putImageData(background_ctx.getImageData(0, 0, background_width, background_height), 0, 0);
 
     dynamic_floor_start = floor(background_height * 0.875);
     dynamic_dirt_start = floor(background_height * 0.895);
@@ -329,9 +326,9 @@ draw();
 function pipe_rect(x, y, width, height, collide, spout, flip) {
     shade_pipe = (x, w = 3) => fillRect(x, y, w, height);
 
-    temp = arguments;
+    get_2d_context = arguments;
 
-    if (collide && calc_col(...temp)) {
+    if (collide && calc_col(...get_2d_context)) {
         player_vel_y = player_terminal_vel_y;
         jump = _ => 0;
         game_over = true;
@@ -386,7 +383,7 @@ function pipe_rect(x, y, width, height, collide, spout, flip) {
 
     // Outside stroke
     stroke(ctx, ...edge_color);
-    ctx.strokeRect(...temp)
+    ctx.strokeRect(...get_2d_context);
 }
 
 // The initialization stuff's at the end so everything can be one let and for clarity
