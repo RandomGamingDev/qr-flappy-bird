@@ -5,6 +5,9 @@
 This is the actual game :D
 
 Here's a youtube video explaining how this project was made: https://www.youtube.com/watch?v=CDMbnNxvrVM
+[![I Fit Flappy Bird onto a QR Code](https://img.youtube.com/vi/CDMbnNxvrVM/0.jpg)](https://www.youtube.com/watch?v=CDMbnNxvrVM)
+
+
 
 You can try it out at https://randomgamingdev.github.io/qr-flappy-bird/build/a.html and the HTML file, QR code, as well as `data:text/html,` based code designed to run anywhere are available under the [`build`](https://github.com/RandomGamingDev/qr-flappy-bird/tree/main/build) directory
 
